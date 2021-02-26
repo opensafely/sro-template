@@ -5,6 +5,7 @@ from cohortextractor import (
     StudyDefinition, 
     patients, 
     codelist, 
+    Measure,
     codelist_from_csv
 )
 
@@ -26,11 +27,7 @@ study = StudyDefinition(
         "rate": "exponential_increase",
         "incidence": 0.1,
     },
-    # This line defines the study population
-    population=patients.registered_with_one_practice_between(
-        "2019-02-01", "2020-02-01"
-    ),
-
+    
     population=patients.satisfying(
         """
         registered AND

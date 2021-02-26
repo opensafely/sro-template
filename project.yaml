@@ -19,11 +19,11 @@ actions:
 
   
   generate_measures:
-      run: cohortextractor:latest generate_measures --study-definition study_definition --output-dir=output/measures
+      run: cohortextractor:latest generate_measures --study-definition study_definition --output-dir=output
       needs: [generate_study_population]
       outputs:
         moderately_sensitive:
-          measure_csv: output/measures/measure_*.csv
+          measure_csv: output/measure_*.csv
 
   get_patient_count:
     run: python:latest python analysis/get_patients_counts.py
