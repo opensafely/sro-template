@@ -1,3 +1,10 @@
 {
-  "files": {}
+  "files": {
+    "opensafely-structured-medication-review-nhs-england.csv": {
+      "id": "opensafely/structured-medication-review-nhs-england/5459205f",
+      "url": "https://codelists.opensafely.org/codelist/opensafely/structured-medication-review-nhs-england/5459205f/",
+      "downloaded_at": "2021-02-26 14:50:37.205798Z",
+      "sha": "7bd4843c423ef7618c6d8f27164dc0939f2c9a9a"
+    }
+  }
 }
