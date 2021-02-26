@@ -2,17 +2,34 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import plotly.graph_objects as go
-from ebmdatalab import charts
 import json
 import datetime
 from dateutil.relativedelta import relativedelta
 import os
 
+# https://github.com/ebmdatalab/datalab-pandas/blob/master/ebmdatalab/charts.py#L20
+def add_percentiles(df, period_column=None, column=None, show_outer_percentiles=True):
+    """For each period in `period_column`, compute percentiles across that
+    range.
+    Adds `percentile` column.
+    """
+    deciles = np.arange(0.1, 1, 0.1)
+    bottom_percentiles = np.arange(0.01, 0.1, 0.01)
+    top_percentiles = np.arange(0.91, 1, 0.01)
+    if show_outer_percentiles:
+        quantiles = np.concatenate((deciles, bottom_percentiles, top_percentiles))
+    else:
+        quantiles = deciles
+    df = df.groupby(period_column)[column].quantile(quantiles).reset_index()
+    df = df.rename(index=str, columns={"level_1": "percentile"})
+    # create integer range of percentiles
+    df["percentile"] = df["percentile"].apply(lambda x: int(x * 100))
+    return df
 
 
 def to_datetime_sort(df):
     df['date'] = pd.to_datetime(df['date'])
-    df.sort_values(by='date', inplace=True)
+    df = df.sort_values(by='date')
 
 
 def redact_small_numbers(df, n, m):
@@ -192,7 +209,7 @@ def create_child_table(df, code_df, code_column, term_column, measure, nrows=5):
 
 
 def get_patients_counts(df, event_column, end_date):
-    f = open("../output/patient_count.json")
+    f = open("output/patient_count.json")
     num_patients = json.load(f)['num_patients']
     dates = list(num_patients.keys())
 
@@ -263,9 +280,9 @@ def get_number_events(df, events_column, end_date):
     return numbers_dict
 
 
-def calculate_statistics_practices(df, end_date):
+def calculate_statistics_practices(df, practice_df, end_date):
 
-    practice_df = pd.read_csv('../output/input_practice_count.csv')
+    
     num_practices = len(np.unique(practice_df['practice']))
 
 
@@ -298,7 +315,7 @@ def calculate_statistics_demographics(df, demographic_var, end_date, event_colum
     year_before = end_date - relativedelta(years=1)
     months_3_before = end_date - relativedelta(months=3)
 
-    categories = np.unique(df[demographic_var])
+    categories = df[demographic_var].unique()
 
     output_dict = {}
     for category in categories:
@@ -327,7 +344,7 @@ def interactive_deciles_chart(
     """period_column must be dates / datetimes
     """
 
-    df = charts.add_percentiles(
+    df = add_percentiles(
         df,
         period_column=period_column,
         column=column,

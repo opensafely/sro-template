@@ -135,6 +135,8 @@ study = StudyDefinition(
 
 
 measures = [
+   
+
     Measure(
         id="1_total",
         numerator="event_x",
