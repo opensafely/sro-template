@@ -6,6 +6,7 @@ import json
 import datetime
 from dateutil.relativedelta import relativedelta
 import os
+from urllib.request import urlopen
 
 # https://github.com/ebmdatalab/datalab-pandas/blob/master/ebmdatalab/charts.py#L20
 def add_percentiles(df, period_column=None, column=None, show_outer_percentiles=True):
@@ -45,9 +46,45 @@ def redact_small_numbers(df, n, m):
     return df
 
 
-def calculate_rate(df, value_col='had_smr', population_col='population', rate_per=1000):
+
+def calculate_rate(df, value_col, population_col, rate_per=1000, standardise=True, age_group_column="age_band"):
     num_per_thousand = df[value_col]/(df[population_col]/rate_per)
     df['rate'] = num_per_thousand
+    
+    def standardise_row(row):
+    
+        age_group = row[age_group_column]
+        rate = row['rate']
+        
+        
+        standardised_rate = rate * standard_pop.loc[str(age_group)]
+        return standardised_rate
+    
+        
+        
+    if standardise:
+        path = "european_standard_population.csv"
+        
+        if not os.path.exists(path):
+            url = "https://www.opendata.nhs.scot/dataset/4dd86111-7326-48c4-8763-8cc4aa190c3e/resource/edee9731-daf7-4e0d-b525-e4c1469b8f69/download/european_standard_population.csv"
+            with urlopen(url) as f:
+                pd.read_csv(f).to_csv(path, index=False)
+                
+                
+        standard_pop = pd.read_csv(path)
+        standard_pop["AgeGroup"] = standard_pop["AgeGroup"].str.replace(" years", "")
+        standard_pop = standard_pop.set_index("AgeGroup")["EuropeanStandardPopulation"]
+        standard_pop = standard_pop / standard_pop.sum()
+        
+        #apply standardisation
+        df['rate_standardised'] = df.apply(standardise_row, axis=1)
+        
+        #groupby on age
+        df = df.groupby("date")["rate", "rate_standardised"].mean().reset_index()
+        
+        
+    return df
+        
 
 
 
@@ -406,4 +443,15 @@ def interactive_deciles_chart(
 
     fig.show()
 
+
+path = "european_standard_population.csv"
+## European standardisation data from:
+# from urllib.request import urlopen
+# url = "https://www.opendata.nhs.scot/dataset/4dd86111-7326-48c4-8763-8cc4aa190c3e/resource/edee9731-daf7-4e0d-b525-e4c1469b8f69/download/european_standard_population.csv"
+# with urlopen(url) as f:
+#     pd.read_csv(f).to_csv(path, index=False)
+standard_pop = pd.read_csv(path)
+standard_pop["AgeGroup"] = standard_pop["AgeGroup"].str.replace(" years", "")
+standard_pop = standard_pop.set_index("AgeGroup")["EuropeanStandardPopulation"]
+standard_pop = standard_pop / standard_pop.sum()
 
