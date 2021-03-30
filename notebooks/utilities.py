@@ -47,8 +47,8 @@ def redact_small_numbers(df, n, m):
 
 
 
-def calculate_rate(df, value_col, population_col, rate_per=1000, standardise=True, age_group_column="age_band"):
-    num_per_thousand = df[value_col]/(df[population_col]/rate_per)
+def calculate_rate(df, m, rate_per=1000, standardise=True, age_group_column="age_band", return_age=False):
+    num_per_thousand = df[m.numerator]/(df[m.denominator]/rate_per)
     df['rate'] = num_per_thousand
     
     def standardise_row(row):
@@ -59,18 +59,11 @@ def calculate_rate(df, value_col, population_col, rate_per=1000, standardise=Tru
         
         standardised_rate = rate * standard_pop.loc[str(age_group)]
         return standardised_rate
-    
-        
         
     if standardise:
         path = "european_standard_population.csv"
         
-        if not os.path.exists(path):
-            url = "https://www.opendata.nhs.scot/dataset/4dd86111-7326-48c4-8763-8cc4aa190c3e/resource/edee9731-daf7-4e0d-b525-e4c1469b8f69/download/european_standard_population.csv"
-            with urlopen(url) as f:
-                pd.read_csv(f).to_csv(path, index=False)
-                
-                
+            
         standard_pop = pd.read_csv(path)
         standard_pop["AgeGroup"] = standard_pop["AgeGroup"].str.replace(" years", "")
         standard_pop = standard_pop.set_index("AgeGroup")["EuropeanStandardPopulation"]
@@ -79,10 +72,40 @@ def calculate_rate(df, value_col, population_col, rate_per=1000, standardise=Tru
         #apply standardisation
         df['rate_standardised'] = df.apply(standardise_row, axis=1)
         
-        #groupby on age
-        df = df.groupby("date")["rate", "rate_standardised"].mean().reset_index()
+        
+        if return_age:
+            df_count = df.groupby(by=["date"]+ m.group_by)[m.numerator, m.denominator].sum().reset_index()
         
         
+            df_rate = df.groupby(by=["date"]+m.group_by)['rate', 'rate_standardised'].mean().reset_index()
+            
+            
+            df = df_count.merge(df_rate, on=["date"] + m.group_by, how="inner")
+        else:
+    
+            df_count = df.groupby(by=["date"]+ (lambda x: x[1:] if len(x)>1 else [])(m.group_by))[m.numerator, m.denominator].sum().reset_index()
+        
+        
+            df_rate = df.groupby(by=["date"]+(lambda x: x[1:] if len(x)>1 else [])(m.group_by))['rate', 'rate_standardised'].mean().reset_index()
+            
+            
+            df = df_count.merge(df_rate, on=["date"] + (lambda x: x[1:] if len(x)>1 else [])(m.group_by), how="inner")
+           
+
+    
+    else:
+        if return_age:
+            df_count = df.groupby(by=["date"] + m.group_by)[m.numerator, m.denominator].sum().reset_index()
+            
+            df_rate = df.groupby(by=["date"]+m.group_by)['rate'].mean().reset_index()
+            
+            df = df_count.merge(df_rate, on=["date"] + m.group_by, how="inner")
+        else:
+            df_count = df.groupby(by=["date"] + (lambda x: x[1:] if len(x)>1 else [])(m.group_by))[m.numerator, m.denominator].sum().reset_index()
+            
+            df_rate = df.groupby(by=["date"]+(lambda x: x[1:] if len(x)>1 else [])(m.group_by))['rate'].mean().reset_index()
+            
+            df = df_count.merge(df_rate, on=["date"] + (lambda x: x[1:] if len(x)>1 else [])(m.group_by), how="inner")
     return df
         
 
