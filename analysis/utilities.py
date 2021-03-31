@@ -83,10 +83,10 @@ def calculate_rate(df, m, rate_per=1000, standardise=True, age_group_column="age
             df = df_count.merge(df_rate, on=["date"] + m.group_by, how="inner")
         else:
     
-            df_count = df.groupby(by=["date"]+ (lambda x: x[1:] if len(x)>1 else [])(m.group_by))[m.numerator, m.denominator].sum().reset_index()
+            df_count = df.groupby(by=["date"]+ (lambda x: x[1:] if len(x)>1 else [])(m.group_by))[[m.numerator, m.denominator]].sum().reset_index()
         
         
-            df_rate = df.groupby(by=["date"]+(lambda x: x[1:] if len(x)>1 else [])(m.group_by))['rate', 'rate_standardised'].mean().reset_index()
+            df_rate = df.groupby(by=["date"]+(lambda x: x[1:] if len(x)>1 else [])(m.group_by))[['rate', 'rate_standardised']].mean().reset_index()
             
             
             df = df_count.merge(df_rate, on=["date"] + (lambda x: x[1:] if len(x)>1 else [])(m.group_by), how="inner")
@@ -111,7 +111,7 @@ def calculate_rate(df, m, rate_per=1000, standardise=True, age_group_column="age
 
 
 
-def plot_measures(df, title, measure_id, column_to_plot, category=False, y_label='Rate per 1000', interactive=True):
+def plot_measures(df, title, column_to_plot, category=False, y_label='Rate per 1000', interactive=True):
 
     if interactive:
 
@@ -169,6 +169,7 @@ def plot_measures(df, title, measure_id, column_to_plot, category=False, y_label
         )
 
         fig.show()
+        
 
     else:
 
@@ -193,7 +194,7 @@ def plot_measures(df, title, measure_id, column_to_plot, category=False, y_label
         else:
             pass
 
-        plt.savefig(f'output/{measure_id}.jpeg', bbox_inches='tight')
+
         plt.show()
         plt.clf()
 
@@ -220,10 +221,10 @@ def drop_irrelevant_practices(df):
 
 
 
-def get_child_codes(df, measure):
+def get_child_codes(df):
 
-    event_code_column = f'{measure}_event_code'
-    event_column = f'{measure}'
+    event_code_column = 'event_code'
+    event_column = 'event'
 
     counts = df.groupby(event_code_column)[event_column].sum()
     code_dict = dict(counts)
@@ -231,12 +232,12 @@ def get_child_codes(df, measure):
     return code_dict
 
 
-def create_child_table(df, code_df, code_column, term_column, measure, nrows=5):
+def create_child_table(df, code_df, code_column, term_column, nrows=5):
     #pass in df from data_dict
     #code df contains first digits and descriptions
 
     #get codes counts
-    code_dict = get_child_codes(df, measure)
+    code_dict = get_child_codes(df)
 
     #make df of events for each subcode
     df = pd.DataFrame.from_dict(

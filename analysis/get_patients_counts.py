@@ -12,7 +12,7 @@ for file in os.listdir('output'):
 
             df = pd.read_csv(os.path.join('output', file))
             
-            patients = np.unique(df['patient_id'][df['event_x']==1])
+            patients = np.unique(df['patient_id'][df['event']==1])
 
             patients_total[date] =[int(x) for x in patients]
 

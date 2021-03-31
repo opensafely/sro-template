@@ -1,5 +1,6 @@
 
 # Import functions
+import json
 
 from cohortextractor import (
     StudyDefinition, 
@@ -12,15 +13,15 @@ from cohortextractor import (
 # Import codelists
 from codelists import *
 
+from config import start_date, end_date, demographics, time_interval
 
-start_date = "2020-12-07"
-end_date = "2021-02-01"
+
 
 
 # Specifiy study defeinition
 
 study = StudyDefinition(
-    index_date="2020-12-07",
+    index_date=start_date,
     # Configure the expectations framework
     default_expectations={
         "date": {"earliest": start_date, "latest": end_date},
@@ -137,16 +138,16 @@ study = StudyDefinition(
             "South East": 0.2, }}}
     ),
 
-    event_x =patients.with_these_clinical_events(
+    event =patients.with_these_clinical_events(
         codelist=holder_codelist,
-        between=["index_date", "index_date + 1 month"],
+        between=["index_date", "index_date + "+time_interval],
         returning="binary_flag",
         return_expectations={"incidence": 0.5}
     ),
 
-    event_x_event_code=patients.with_these_clinical_events(
+    event_code=patients.with_these_clinical_events(
         codelist=holder_codelist,
-        between=["index_date", "index_date + 1 month"],
+        between=["index_date", "index_date + "+time_interval],
         returning="code",
         return_expectations={"category": {
             "ratios": {"1239511000000100": 1}}, }
@@ -154,52 +155,43 @@ study = StudyDefinition(
     
 )
 
-
+# Create default measures
 measures = [
-   
 
     Measure(
-        id="1_total",
-        numerator="event_x",
+        id="total",
+        numerator="event",
         denominator="population",
         group_by=["age_band"]
     ),
 
     Measure(
-        id="1_event_code",
-        numerator="event_x",
+        id="event_code",
+        numerator="event",
         denominator="population",
-        group_by=["age_band","event_x_event_code"]
+        group_by=["age_band","event_code"]
     ),
 
     Measure(
-        id="1_practice_only",
-        numerator="event_x",
+        id="practice",
+        numerator="event",
         denominator="population",
         group_by=["age_band","practice"]
     ),
 
-    Measure(
-        id="1_by_region",
-        numerator="event_x",
-        denominator="population",
-        group_by=["age_band","region"],
-    ),
 
-    Measure(
-        id="1_by_sex",
-        numerator="event_x",
-        denominator="population",
-        group_by=["age_band","sex"],
-    ),
-
-    Measure(
-        id="1_by_age_band",
-        numerator="event_x",
-        denominator="population",
-        group_by=["age_band"],
-    ),
-
-
-    
 ]
+
+
+#Add demographics measures
+
+for d in demographics:
+    m = Measure(
+        id=d,
+        numerator="event",
+        denominator="population",
+        group_by=["age_band", "region"]
+    )
+    measures.append(m)
+
+
