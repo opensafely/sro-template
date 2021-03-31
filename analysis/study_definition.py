@@ -11,7 +11,7 @@ from cohortextractor import (
 )
 
 # Import codelists
-from codelists import *
+from codelists import codelist
 
 from config import start_date, end_date, demographics, time_interval
 
@@ -139,14 +139,14 @@ study = StudyDefinition(
     ),
 
     event =patients.with_these_clinical_events(
-        codelist=holder_codelist,
+        codelist=codelist,
         between=["index_date", "index_date + "+time_interval],
         returning="binary_flag",
         return_expectations={"incidence": 0.5}
     ),
 
     event_code=patients.with_these_clinical_events(
-        codelist=holder_codelist,
+        codelist=codelist,
         between=["index_date", "index_date + "+time_interval],
         returning="code",
         return_expectations={"category": {
@@ -186,12 +186,22 @@ measures = [
 #Add demographics measures
 
 for d in demographics:
-    m = Measure(
+
+    if d=='age_band':
+        m = Measure(
         id=d,
         numerator="event",
         denominator="population",
-        group_by=["age_band", "region"]
+        group_by=["age_band"]
     )
+    else:
+
+        m = Measure(
+            id=d,
+            numerator="event",
+            denominator="population",
+            group_by=["age_band", d]
+        )
     measures.append(m)
 
 

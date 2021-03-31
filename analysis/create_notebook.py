@@ -64,12 +64,20 @@ measures = [
 ]
 
 for d in demographics:
-    m = Measure(
+    if d=='age_band':
+        m = Measure(
         id=d,
         numerator="event",
         denominator="population",
-        group_by=["age_band", "region"]
-    )
+        group_by=["age_band"]
+        )
+    else:
+        m = Measure(
+            id=d,
+            numerator="event",
+            denominator="population",
+            group_by=["age_band", d]
+        )
     measures.append(m)
 
 default_measures = ['total', 'event_code', 'practice']
@@ -111,7 +119,11 @@ for key, value in measures_dict.items():
     
     to_datetime_sort(df)
     
-    data_dict[value.id] = calculate_rate(df, m=value, rate_per=1000)
+    if value.id=='age_band':
+        data_dict[value.id] = calculate_rate(df, m=value, rate_per=1000, return_age=True)
+
+    else:
+        data_dict[value.id] = calculate_rate(df, m=value, rate_per=1000)
 
 
 
@@ -165,18 +177,25 @@ nb['cells'] = [
     nbf.v4.new_code_cell(output_practice_plot),
     ]
 
-for d in demographics:
+counter = """\
+i=0
+"""
+
+nb['cells'].append(nbf.v4.new_code_cell(counter))
+
+for d in range(len(demographics)):
     cell_counts = """\
     display(
-    md(f"## Breakdown by {d}")
+    md(f"## Breakdown by {demographics[i]}")
     )
-    counts_df = calculate_statistics_demographics(df=data_dict[d], demographic_var=d, end_date=end_date, event_column='event')
+    counts_df = calculate_statistics_demographics(df=data_dict[demographics[i]], demographic_var=demographics[i], end_date=end_date, event_column='event')
     counts_df
     """
     nb['cells'].append(nbf.v4.new_code_cell(cell_counts))
     
     cell_plot = """\
-    plot_measures(data_dict[d], title=f'Breakdown by {d}', column_to_plot='rate_standardised', category='region', y_label='Standardised Rate per 1000')
+    plot_measures(data_dict[demographics[i]], title=f'Breakdown by {demographics[i]}', column_to_plot='rate_standardised', category=demographics[i], y_label='Standardised Rate per 1000')
+    i+=1
     """
     nb['cells'].append(nbf.v4.new_code_cell(cell_plot))
 

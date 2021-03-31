@@ -74,10 +74,10 @@ def calculate_rate(df, m, rate_per=1000, standardise=True, age_group_column="age
         
         
         if return_age:
-            df_count = df.groupby(by=["date"]+ m.group_by)[m.numerator, m.denominator].sum().reset_index()
+            df_count = df.groupby(by=["date"]+ m.group_by)[[m.numerator, m.denominator]].sum().reset_index()
         
         
-            df_rate = df.groupby(by=["date"]+m.group_by)['rate', 'rate_standardised'].mean().reset_index()
+            df_rate = df.groupby(by=["date"]+m.group_by)[['rate', 'rate_standardised']].mean().reset_index()
             
             
             df = df_count.merge(df_rate, on=["date"] + m.group_by, how="inner")
@@ -95,15 +95,15 @@ def calculate_rate(df, m, rate_per=1000, standardise=True, age_group_column="age
     
     else:
         if return_age:
-            df_count = df.groupby(by=["date"] + m.group_by)[m.numerator, m.denominator].sum().reset_index()
+            df_count = df.groupby(by=["date"] + m.group_by)[[m.numerator, m.denominator]].sum().reset_index()
             
-            df_rate = df.groupby(by=["date"]+m.group_by)['rate'].mean().reset_index()
+            df_rate = df.groupby(by=["date"]+m.group_by)[['rate']].mean().reset_index()
             
             df = df_count.merge(df_rate, on=["date"] + m.group_by, how="inner")
         else:
-            df_count = df.groupby(by=["date"] + (lambda x: x[1:] if len(x)>1 else [])(m.group_by))[m.numerator, m.denominator].sum().reset_index()
+            df_count = df.groupby(by=["date"] + (lambda x: x[1:] if len(x)>1 else [])(m.group_by))[[m.numerator, m.denominator]].sum().reset_index()
             
-            df_rate = df.groupby(by=["date"]+(lambda x: x[1:] if len(x)>1 else [])(m.group_by))['rate'].mean().reset_index()
+            df_rate = df.groupby(by=["date"]+(lambda x: x[1:] if len(x)>1 else [])(m.group_by))[['rate']].mean().reset_index()
             
             df = df_count.merge(df_rate, on=["date"] + (lambda x: x[1:] if len(x)>1 else [])(m.group_by), how="inner")
     return df
