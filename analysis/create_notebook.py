@@ -16,7 +16,7 @@ from IPython.display import HTML
 from IPython.display import Markdown as md
 from IPython.core.display import HTML as Center
 from utilities import *
-from config import marker, start_date, end_date, demographics
+from config import marker, start_date, end_date, demographics, codelist_code_column, codelist_term_column
 
 
 %matplotlib inline
@@ -87,6 +87,8 @@ measures_dict = {}
 for m in measures:
     measures_dict[m.id] = m
 
+
+
 """
 
 header = """\
@@ -146,7 +148,7 @@ output_event_codes = """\
 display(
 md("### Sub totals by sub codes"),
 md("Events for the top 5 subcodes across the study period"))
-child_table = create_child_table(df=data_dict['event_code'], code_df=codelist, code_column='code', term_column='term')
+child_table = create_child_table(df=data_dict['event_code'], code_df=codelist, code_column=codelist_code_column, term_column=codelist_term_column)
 child_table
     """
 
