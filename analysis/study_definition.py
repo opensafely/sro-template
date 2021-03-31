@@ -137,6 +137,7 @@ study = StudyDefinition(
             "London": 0.2,
             "South East": 0.2, }}}
     ),
+    
 
     event =patients.with_these_clinical_events(
         codelist=codelist,
