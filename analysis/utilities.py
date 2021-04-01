@@ -33,17 +33,29 @@ def to_datetime_sort(df):
     df = df.sort_values(by='date')
 
 
-def redact_small_numbers(df, n, m):
+def redact_small_numbers(df, n, counts_columns):
     """
-    Takes measures df and converts any row to nana where value of denominator or numerater in measure m equal to 
-    or below n
-    Returns df of same shape.
+    Takes counts df as input and suppresses low numbers.  Sequentially redacts
+    low numbers from each column until count of redcted values >=n.
+    
+    df: input df
+    n: threshold for low number suppression
+    counts_columns: list of columns in df that contain counts to be suppressed.
     """
-    mask_n = df[m.numerator].isin(list(range(0, n+1)))
-    mask_d = df[m.denominator].isin(list(range(0, n+1)))
-    mask = mask_n | mask_d
-    df.loc[mask, :] = np.nan
-    return df
+    
+    for column in counts_columns:
+        series = df[column]
+        
+         
+        count = min(series)
+        
+        while count <n:
+            min_index = np.argmin(series)
+
+            count+= series[min_index]
+            series.iloc[min_index] = np.nan
+            
+    return df  
 
 
 
