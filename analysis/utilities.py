@@ -33,6 +33,26 @@ def to_datetime_sort(df):
     df['date'] = pd.to_datetime(df['date'])
     df = df.sort_values(by='date')
 
+def calculate_imd_group(df, disease_column, rate_column):
+    imd_column = pd.to_numeric(df["imd"])
+    df["imd"] = pd.qcut(imd_column, q=5,duplicates="drop", labels=['1', '2', '3', '4', '5'])      
+    df_rate = df.groupby(by=["date", "imd"])[[rate_column]].mean().reset_index()
+    df_population = df.groupby(by=["date", "imd"])[[disease_column, "population"]].sum().reset_index()
+    df = df_rate.merge(df_population, on=["date", "imd"], how="inner")
+    
+    
+ 
+    # group_mapping_dict = {'1': "Most deprived", '2': "Middle level", '3': "Middle level", '4': "Middle level", '5': "Least deprived"}
+    # df['imd_group'] = df.apply(lambda row: group_mapping_dict[row.imd], axis=1)
+    
+    df_rate = df.groupby(by=["date", "imd"])[[rate_column]].mean().reset_index()
+
+    df_population = df.groupby(by=["date", "imd"])[[disease_column, "population"]].sum().reset_index()
+    
+    df_merged = df_rate.merge(df_population, on=["date", "imd"], how="inner")
+    
+    return df_merged
+    
 
 def redact_small_numbers(df, n, counts_columns):
     """

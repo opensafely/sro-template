@@ -13,7 +13,7 @@ from cohortextractor import (
 # Import codelists
 from codelists import codelist
 
-from config import start_date, end_date, demographics, time_interval
+from config import start_date, end_date, demographics
 
 
 
@@ -151,14 +151,14 @@ study = StudyDefinition(
     
     event =patients.with_these_clinical_events(
         codelist=codelist,
-        between=["index_date", "index_date + "+time_interval],
+        between=["index_date", "last_day_of_month(index_date)"],
         returning="binary_flag",
         return_expectations={"incidence": 0.5}
     ),
 
     event_code=patients.with_these_clinical_events(
         codelist=codelist,
-        between=["index_date", "index_date + "+time_interval],
+        between=["index_date", "last_day_of_month(index_date)"],
         returning="code",
         return_expectations={"category": {
             "ratios": {"1239511000000100": 1}}, }
