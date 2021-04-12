@@ -138,6 +138,27 @@ study = StudyDefinition(
             "South East": 0.2, }}}
     ),
     
+    imd=patients.address_as_of(
+        "index_date",
+        returning="index_of_multiple_deprivation",
+        round_to_nearest=100,
+        return_expectations={
+            "rate": "universal",
+            "category": {"ratios": {"100": 0.2, "200": 0.2, "300": 0.2, "400": 0.2, "500": 0.2}},
+        },
+    ),
+
+    # ETHNICITY IN 6 CATEGORIES
+    ethnicity=patients.with_these_clinical_events(
+        ethnicity_codes,
+        returning="category",
+        find_last_match_in_period=True,
+        include_date_of_match=False,
+        return_expectations={
+            "category": {"ratios": {"1": 0.2, "2": 0.2, "3": 0.2, "4": 0.2, "5": 0.2}},
+            "incidence": 0.75,
+        },
+    ),
 
     event =patients.with_these_clinical_events(
         codelist=codelist,
