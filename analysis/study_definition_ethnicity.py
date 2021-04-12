@@ -7,7 +7,7 @@ from cohortextractor import (
 )
 from config import start_date, end_date, demographics, time_interval
 
-from codelists import *
+from codelists import ethnicity_codes
 
 study = StudyDefinition(
     default_expectations={

@@ -205,6 +205,8 @@ for d in demographics:
         denominator="population",
         group_by=["age_band"]
     )
+    elif d=="ethnicity":
+        pass
     else:
 
         m = Measure(

@@ -29,6 +29,7 @@ def add_percentiles(df, period_column=None, column=None, show_outer_percentiles=
 
 
 def to_datetime_sort(df):
+    
     df['date'] = pd.to_datetime(df['date'])
     df = df.sort_values(by='date')
 
