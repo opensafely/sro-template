@@ -143,7 +143,7 @@ for key, value in measures_dict.items():
 
 
 codelist = pd.read_csv('../codelists/opensafely-structured-medication-review-nhs-england.csv')
-codelist = codelist.round(16)
+
 """
 
 output_total_title = """\

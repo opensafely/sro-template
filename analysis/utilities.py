@@ -7,6 +7,7 @@ import datetime
 from dateutil.relativedelta import relativedelta
 import os
 from urllib.request import urlopen
+from pandas.api.types import is_numeric_dtype
 
 # https://github.com/ebmdatalab/datalab-pandas/blob/master/ebmdatalab/charts.py#L20
 def add_percentiles(df, period_column=None, column=None, show_outer_percentiles=True):
@@ -155,7 +156,7 @@ def plot_measures(df, title, column_to_plot, category=False, y_label='Rate per 1
 
                 df_subset = df[df[category] == unique_category]
                 fig.add_trace(go.Scatter(
-                    x=df_subset['date'], y=df_subset[column_to_plot], name=unique_category))
+                    x=df_subset['date'], y=df_subset[column_to_plot], name=str(unique_category)))
 
         else:
             fig.add_trace(go.Scatter(
@@ -276,6 +277,13 @@ def create_child_table(df, code_df, code_column, term_column, nrows=5):
     df = pd.DataFrame.from_dict(
         code_dict, orient="index", columns=["Events"])
     df[code_column] = df.index
+
+    #convert snomed
+    if is_numeric_dtype(df[code_column]):
+        
+      
+        df = df.astype({code_column: 'int64'})
+        df.reset_index(drop=True, inplace=True)
 
     #convert events to events/thousand
     df['Events (thousands)'] = df['Events'].apply(lambda x: x/1000)
