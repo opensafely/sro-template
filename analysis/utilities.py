@@ -401,7 +401,7 @@ def calculate_statistics_practices(df, practice_df, end_date):
     practices_included_total, practices_included_percent_total, practices_included_months_3, practices_included_percent_months_3
 
 def convert_ethnicity(df):
-    ethnicity_codes = {1.0: "White", 2.0: "Mixed", 3.0: "Asian", 4.0: "Black", 5.0:"Other", np.nan: "unknown"}
+    ethnicity_codes = {1.0: "White", 2.0: "Mixed", 3.0: "Asian", 4.0: "Black", 5.0:"Other", np.nan: "unknown", 0: "unknown"}
 
     df = df.replace({"ethnicity": ethnicity_codes})
     return df

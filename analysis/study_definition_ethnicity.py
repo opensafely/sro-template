@@ -20,7 +20,7 @@ study = StudyDefinition(
     ),
 
     # ETHNICITY IN 6 CATEGORIES
-    ethnicity=patients.with_these_clinical_events(
+    eth=patients.with_these_clinical_events(
         ethnicity_codes,
         returning="category",
         find_last_match_in_period=True,
@@ -31,7 +31,30 @@ study = StudyDefinition(
         },
     ),
 
+    # fill missing ethnicity from SUS
+    ethnicity_sus = patients.with_ethnicity_from_sus(
+        returning="group_6",  
+        use_most_frequent_code=True,
+        return_expectations={
+            "category": {"ratios": {"1": 0.2, "2": 0.2, "3": 0.2, "4": 0.2, "5": 0.2}},
+            "incidence": 0.4,
+            },
+    ),
+    
 
+    ethnicity = patients.categorised_as(
+            {"0": "DEFAULT",
+            "1": "eth='1' OR (NOT eth AND ethnicity_sus='1')", 
+            "2": "eth='2' OR (NOT eth AND ethnicity_sus='2')", 
+            "3": "eth='3' OR (NOT eth AND ethnicity_sus='3')", 
+            "4": "eth='4' OR (NOT eth AND ethnicity_sus='4')",  
+            "5": "eth='5' OR (NOT eth AND ethnicity_sus='5')",
+            }, 
+            return_expectations={
+            "category": {"ratios": {"1": 0.2, "2": 0.2, "3": 0.2, "4": 0.2, "5": 0.2}},
+            "incidence": 0.4,
+            },
+    ),
 
 
 )
