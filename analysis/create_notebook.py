@@ -89,6 +89,7 @@ for m in measures:
 
 
 
+
 """
 
 header = """\
@@ -123,6 +124,17 @@ for key, value in measures_dict.items():
     
     if value.id=='age_band':
         data_dict[value.id] = calculate_rate(df, m=value, rate_per=1000, return_age=True)
+    elif key == "imd":
+       
+        df = calculate_rate(df, m=value, rate_per=1000)
+       
+        df_grouped = calculate_imd_group(df, 'event', 'rate_standardised')
+        
+        data_dict[value.id] = df_grouped
+    
+    elif key == "ethnicity":
+        df = convert_ethnicity(df)
+        data_dict[value.id] = calculate_rate(df, m=value, rate_per=1000)
 
     else:
         data_dict[value.id] = calculate_rate(df, m=value, rate_per=1000)

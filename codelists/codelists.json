@@ -5,6 +5,12 @@
       "url": "https://codelists.opensafely.org/codelist/opensafely/structured-medication-review-nhs-england/5459205f/",
       "downloaded_at": "2021-02-26 14:50:37.205798Z",
       "sha": "7bd4843c423ef7618c6d8f27164dc0939f2c9a9a"
+    },
+    "opensafely-ethnicity.csv": {
+      "id": "opensafely/ethnicity/2020-04-27",
+      "url": "https://codelists.opensafely.org/codelist/opensafely/ethnicity/2020-04-27/",
+      "downloaded_at": "2021-04-12 09:28:36.527864Z",
+      "sha": "3d2f3998b71863a80b24d60f6f4282e14191ae13"
     }
   }
 }

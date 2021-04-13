@@ -13,7 +13,7 @@ from cohortextractor import (
 # Import codelists
 from codelists import codelist
 
-from config import start_date, end_date, demographics, time_interval
+from config import start_date, end_date, demographics
 
 
 
@@ -138,17 +138,27 @@ study = StudyDefinition(
             "South East": 0.2, }}}
     ),
     
+    imd=patients.address_as_of(
+        "index_date",
+        returning="index_of_multiple_deprivation",
+        round_to_nearest=100,
+        return_expectations={
+            "rate": "universal",
+            "category": {"ratios": {"100": 0.2, "200": 0.2, "300": 0.2, "400": 0.2, "500": 0.2}},
+        },
+    ),
 
+    
     event =patients.with_these_clinical_events(
         codelist=codelist,
-        between=["index_date", "index_date + "+time_interval],
+        between=["index_date", "last_day_of_month(index_date)"],
         returning="binary_flag",
         return_expectations={"incidence": 0.5}
     ),
 
     event_code=patients.with_these_clinical_events(
         codelist=codelist,
-        between=["index_date", "index_date + "+time_interval],
+        between=["index_date", "last_day_of_month(index_date)"],
         returning="code",
         return_expectations={"category": {
             "ratios": {"1239511000000100": 1}}, }
@@ -195,6 +205,8 @@ for d in demographics:
         denominator="population",
         group_by=["age_band"]
     )
+    elif d=="ethnicity":
+        pass
     else:
 
         m = Measure(
