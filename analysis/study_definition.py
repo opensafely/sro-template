@@ -1,5 +1,6 @@
 
 # Import functions
+import json
 
 from cohortextractor import (
     StudyDefinition, 
@@ -10,17 +11,17 @@ from cohortextractor import (
 )
 
 # Import codelists
-from codelists import *
+from codelists import codelist, ld_codes
+
+from config import start_date, end_date, demographics
 
 
-start_date = "2020-12-07"
-end_date = "2021-02-01"
 
 
 # Specifiy study defeinition
 
 study = StudyDefinition(
-    index_date="2020-12-07",
+    index_date=start_date,
     # Configure the expectations framework
     default_expectations={
         "date": {"earliest": start_date, "latest": end_date},
@@ -136,17 +137,35 @@ study = StudyDefinition(
             "London": 0.2,
             "South East": 0.2, }}}
     ),
+    
+    imd=patients.address_as_of(
+        "index_date",
+        returning="index_of_multiple_deprivation",
+        round_to_nearest=100,
+        return_expectations={
+            "rate": "universal",
+            "category": {"ratios": {"100": 0.2, "200": 0.2, "300": 0.2, "400": 0.2, "500": 0.2}},
+        },
+    ),
 
-    event_x =patients.with_these_clinical_events(
-        codelist=holder_codelist,
-        between=["index_date", "index_date + 1 month"],
+    learning_disability=patients.with_these_clinical_events(
+        ld_codes,
+        on_or_before="index_date",
+        returning="binary_flag",
+        return_expectations={"incidence": 0.01, },
+    ),
+
+
+    event =patients.with_these_clinical_events(
+        codelist=codelist,
+        between=["index_date", "last_day_of_month(index_date)"],
         returning="binary_flag",
         return_expectations={"incidence": 0.5}
     ),
 
-    event_x_event_code=patients.with_these_clinical_events(
-        codelist=holder_codelist,
-        between=["index_date", "index_date + 1 month"],
+    event_code=patients.with_these_clinical_events(
+        codelist=codelist,
+        between=["index_date", "last_day_of_month(index_date)"],
         returning="code",
         return_expectations={"category": {
             "ratios": {"1239511000000100": 1}}, }
@@ -154,52 +173,55 @@ study = StudyDefinition(
     
 )
 
-
+# Create default measures
 measures = [
-   
 
     Measure(
-        id="1_total",
-        numerator="event_x",
+        id="total",
+        numerator="event",
         denominator="population",
         group_by=["age_band"]
     ),
 
     Measure(
-        id="1_event_code",
-        numerator="event_x",
+        id="event_code",
+        numerator="event",
         denominator="population",
-        group_by=["age_band","event_x_event_code"]
+        group_by=["age_band","event_code"]
     ),
 
     Measure(
-        id="1_practice_only",
-        numerator="event_x",
+        id="practice",
+        numerator="event",
         denominator="population",
         group_by=["age_band","practice"]
     ),
 
-    Measure(
-        id="1_by_region",
-        numerator="event_x",
-        denominator="population",
-        group_by=["age_band","region"],
-    ),
 
-    Measure(
-        id="1_by_sex",
-        numerator="event_x",
-        denominator="population",
-        group_by=["age_band","sex"],
-    ),
-
-    Measure(
-        id="1_by_age_band",
-        numerator="event_x",
-        denominator="population",
-        group_by=["age_band"],
-    ),
-
-
-    
 ]
+
+
+#Add demographics measures
+
+for d in demographics:
+
+    if d=='age_band':
+        m = Measure(
+        id=d,
+        numerator="event",
+        denominator="population",
+        group_by=["age_band"]
+    )
+    elif d=="ethnicity":
+        pass
+    else:
+
+        m = Measure(
+            id=d,
+            numerator="event",
+            denominator="population",
+            group_by=["age_band", d]
+        )
+    measures.append(m)
+
+

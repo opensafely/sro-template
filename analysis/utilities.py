@@ -7,6 +7,7 @@ import datetime
 from dateutil.relativedelta import relativedelta
 import os
 from urllib.request import urlopen
+from pandas.api.types import is_numeric_dtype
 
 # https://github.com/ebmdatalab/datalab-pandas/blob/master/ebmdatalab/charts.py#L20
 def add_percentiles(df, period_column=None, column=None, show_outer_percentiles=True):
@@ -29,21 +30,54 @@ def add_percentiles(df, period_column=None, column=None, show_outer_percentiles=
 
 
 def to_datetime_sort(df):
+    
     df['date'] = pd.to_datetime(df['date'])
     df = df.sort_values(by='date')
 
+def calculate_imd_group(df, disease_column, rate_column):
+    imd_column = pd.to_numeric(df["imd"])
+    df["imd"] = pd.qcut(imd_column, q=5,duplicates="drop", labels=['Most deprived', '2', '3', '4', 'Least deprived'])      
+    df_rate = df.groupby(by=["date", "imd"])[[rate_column]].mean().reset_index()
+    df_population = df.groupby(by=["date", "imd"])[[disease_column, "population"]].sum().reset_index()
+    df = df_rate.merge(df_population, on=["date", "imd"], how="inner")
+    
+    
+ 
+    # group_mapping_dict = {'1': "Most deprived", '2': "Middle level", '3': "Middle level", '4': "Middle level", '5': "Least deprived"}
+    # df['imd_group'] = df.apply(lambda row: group_mapping_dict[row.imd], axis=1)
+    
+    df_rate = df.groupby(by=["date", "imd"])[[rate_column]].mean().reset_index()
 
-def redact_small_numbers(df, n, m):
+    df_population = df.groupby(by=["date", "imd"])[[disease_column, "population"]].sum().reset_index()
+    
+    df_merged = df_rate.merge(df_population, on=["date", "imd"], how="inner")
+    
+    return df_merged
+    
+
+def redact_small_numbers(df, n, counts_columns):
     """
-    Takes measures df and converts any row to nana where value of denominator or numerater in measure m equal to 
-    or below n
-    Returns df of same shape.
+    Takes counts df as input and suppresses low numbers.  Sequentially redacts
+    low numbers from each column until count of redcted values >=n.
+    
+    df: input df
+    n: threshold for low number suppression
+    counts_columns: list of columns in df that contain counts to be suppressed.
     """
-    mask_n = df[m.numerator].isin(list(range(0, n+1)))
-    mask_d = df[m.denominator].isin(list(range(0, n+1)))
-    mask = mask_n | mask_d
-    df.loc[mask, :] = np.nan
-    return df
+    
+    for column in counts_columns:
+        series = df[column]
+        
+         
+        count = min(series)
+        
+        while count <n:
+            min_index = np.argmin(series)
+
+            count+= series[min_index]
+            series.iloc[min_index] = np.nan
+            
+    return df  
 
 
 
@@ -74,19 +108,19 @@ def calculate_rate(df, m, rate_per=1000, standardise=True, age_group_column="age
         
         
         if return_age:
-            df_count = df.groupby(by=["date"]+ m.group_by)[m.numerator, m.denominator].sum().reset_index()
+            df_count = df.groupby(by=["date"]+ m.group_by)[[m.numerator, m.denominator]].sum().reset_index()
         
         
-            df_rate = df.groupby(by=["date"]+m.group_by)['rate', 'rate_standardised'].mean().reset_index()
+            df_rate = df.groupby(by=["date"]+m.group_by)[['rate', 'rate_standardised']].mean().reset_index()
             
             
             df = df_count.merge(df_rate, on=["date"] + m.group_by, how="inner")
         else:
     
-            df_count = df.groupby(by=["date"]+ (lambda x: x[1:] if len(x)>1 else [])(m.group_by))[m.numerator, m.denominator].sum().reset_index()
+            df_count = df.groupby(by=["date"]+ (lambda x: x[1:] if len(x)>1 else [])(m.group_by))[[m.numerator, m.denominator]].sum().reset_index()
         
         
-            df_rate = df.groupby(by=["date"]+(lambda x: x[1:] if len(x)>1 else [])(m.group_by))['rate', 'rate_standardised'].mean().reset_index()
+            df_rate = df.groupby(by=["date"]+(lambda x: x[1:] if len(x)>1 else [])(m.group_by))[['rate', 'rate_standardised']].mean().reset_index()
             
             
             df = df_count.merge(df_rate, on=["date"] + (lambda x: x[1:] if len(x)>1 else [])(m.group_by), how="inner")
@@ -95,15 +129,15 @@ def calculate_rate(df, m, rate_per=1000, standardise=True, age_group_column="age
     
     else:
         if return_age:
-            df_count = df.groupby(by=["date"] + m.group_by)[m.numerator, m.denominator].sum().reset_index()
+            df_count = df.groupby(by=["date"] + m.group_by)[[m.numerator, m.denominator]].sum().reset_index()
             
-            df_rate = df.groupby(by=["date"]+m.group_by)['rate'].mean().reset_index()
+            df_rate = df.groupby(by=["date"]+m.group_by)[['rate']].mean().reset_index()
             
             df = df_count.merge(df_rate, on=["date"] + m.group_by, how="inner")
         else:
-            df_count = df.groupby(by=["date"] + (lambda x: x[1:] if len(x)>1 else [])(m.group_by))[m.numerator, m.denominator].sum().reset_index()
+            df_count = df.groupby(by=["date"] + (lambda x: x[1:] if len(x)>1 else [])(m.group_by))[[m.numerator, m.denominator]].sum().reset_index()
             
-            df_rate = df.groupby(by=["date"]+(lambda x: x[1:] if len(x)>1 else [])(m.group_by))['rate'].mean().reset_index()
+            df_rate = df.groupby(by=["date"]+(lambda x: x[1:] if len(x)>1 else [])(m.group_by))[['rate']].mean().reset_index()
             
             df = df_count.merge(df_rate, on=["date"] + (lambda x: x[1:] if len(x)>1 else [])(m.group_by), how="inner")
     return df
@@ -111,7 +145,7 @@ def calculate_rate(df, m, rate_per=1000, standardise=True, age_group_column="age
 
 
 
-def plot_measures(df, title, measure_id, column_to_plot, category=False, y_label='Rate per 1000', interactive=True):
+def plot_measures(df, title, column_to_plot, category=False, y_label='Rate per 1000', interactive=True):
 
     if interactive:
 
@@ -122,7 +156,7 @@ def plot_measures(df, title, measure_id, column_to_plot, category=False, y_label
 
                 df_subset = df[df[category] == unique_category]
                 fig.add_trace(go.Scatter(
-                    x=df_subset['date'], y=df_subset[column_to_plot], name=unique_category))
+                    x=df_subset['date'], y=df_subset[column_to_plot], name=str(unique_category)))
 
         else:
             fig.add_trace(go.Scatter(
@@ -169,6 +203,7 @@ def plot_measures(df, title, measure_id, column_to_plot, category=False, y_label
         )
 
         fig.show()
+        
 
     else:
 
@@ -193,7 +228,7 @@ def plot_measures(df, title, measure_id, column_to_plot, category=False, y_label
         else:
             pass
 
-        plt.savefig(f'output/{measure_id}.jpeg', bbox_inches='tight')
+
         plt.show()
         plt.clf()
 
@@ -220,10 +255,10 @@ def drop_irrelevant_practices(df):
 
 
 
-def get_child_codes(df, measure):
+def get_child_codes(df):
 
-    event_code_column = f'{measure}_event_code'
-    event_column = f'{measure}'
+    event_code_column = 'event_code'
+    event_column = 'event'
 
     counts = df.groupby(event_code_column)[event_column].sum()
     code_dict = dict(counts)
@@ -231,17 +266,24 @@ def get_child_codes(df, measure):
     return code_dict
 
 
-def create_child_table(df, code_df, code_column, term_column, measure, nrows=5):
+def create_child_table(df, code_df, code_column, term_column, nrows=5):
     #pass in df from data_dict
     #code df contains first digits and descriptions
 
     #get codes counts
-    code_dict = get_child_codes(df, measure)
+    code_dict = get_child_codes(df)
 
     #make df of events for each subcode
     df = pd.DataFrame.from_dict(
         code_dict, orient="index", columns=["Events"])
     df[code_column] = df.index
+
+    #convert snomed
+    if is_numeric_dtype(df[code_column]):
+        
+      
+        df = df.astype({code_column: 'int64'})
+        df.reset_index(drop=True, inplace=True)
 
     #convert events to events/thousand
     df['Events (thousands)'] = df['Events'].apply(lambda x: x/1000)
@@ -366,6 +408,11 @@ def calculate_statistics_practices(df, practice_df, end_date):
     
     practices_included_total, practices_included_percent_total, practices_included_months_3, practices_included_percent_months_3
 
+def convert_ethnicity(df):
+    ethnicity_codes = {1.0: "White", 2.0: "Mixed", 3.0: "Asian", 4.0: "Black", 5.0:"Other", np.nan: "unknown", 0: "unknown"}
+
+    df = df.replace({"ethnicity": ethnicity_codes})
+    return df
 
 def calculate_statistics_demographics(df, demographic_var, end_date, event_column):
 
