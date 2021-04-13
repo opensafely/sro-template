@@ -11,7 +11,7 @@ from cohortextractor import (
 )
 
 # Import codelists
-from codelists import codelist
+from codelists import codelist, ld_codes
 
 from config import start_date, end_date, demographics
 
@@ -148,7 +148,14 @@ study = StudyDefinition(
         },
     ),
 
-    
+    learning_disability=patients.with_these_clinical_events(
+        ld_codes,
+        on_or_before="index_date",
+        returning="binary_flag",
+        return_expectations={"incidence": 0.01, },
+    ),
+
+
     event =patients.with_these_clinical_events(
         codelist=codelist,
         between=["index_date", "last_day_of_month(index_date)"],
