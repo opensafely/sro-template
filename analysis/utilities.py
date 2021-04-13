@@ -35,7 +35,7 @@ def to_datetime_sort(df):
 
 def calculate_imd_group(df, disease_column, rate_column):
     imd_column = pd.to_numeric(df["imd"])
-    df["imd"] = pd.qcut(imd_column, q=5,duplicates="drop", labels=['1', '2', '3', '4', '5'])      
+    df["imd"] = pd.qcut(imd_column, q=5,duplicates="drop", labels=['Most deprived', '2', '3', '4', 'Least deprived'])      
     df_rate = df.groupby(by=["date", "imd"])[[rate_column]].mean().reset_index()
     df_population = df.groupby(by=["date", "imd"])[[disease_column, "population"]].sum().reset_index()
     df = df_rate.merge(df_population, on=["date", "imd"], how="inner")
@@ -400,6 +400,11 @@ def calculate_statistics_practices(df, practice_df, end_date):
     
     practices_included_total, practices_included_percent_total, practices_included_months_3, practices_included_percent_months_3
 
+def convert_ethnicity(df):
+    ethnicity_codes = {1.0: "White", 2.0: "Mixed", 3.0: "Asian", 4.0: "Black", 5.0:"Other", np.nan: "unknown"}
+
+    df = df.replace({"ethnicity": ethnicity_codes})
+    return df
 
 def calculate_statistics_demographics(df, demographic_var, end_date, event_column):
 
