@@ -5,7 +5,7 @@ from cohortextractor import (
     codelist_from_csv,
     Measure,
 )
-from config import start_date, end_date, demographics
+from config import start_date, end_date
 
 from codelists import ethnicity_codes
 

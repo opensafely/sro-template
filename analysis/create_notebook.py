@@ -71,6 +71,7 @@ for d in demographics:
         denominator="population",
         group_by=["age_band"]
         )
+        measures.append(m)
     else:
         m = Measure(
             id=d,
@@ -78,7 +79,7 @@ for d in demographics:
             denominator="population",
             group_by=["age_band", d]
         )
-    measures.append(m)
+        measures.append(m)
 
 default_measures = ['total', 'event_code', 'practice']
 measures_ids = default_measures+ demographics
