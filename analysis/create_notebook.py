@@ -16,7 +16,7 @@ from IPython.display import HTML
 from IPython.display import Markdown as md
 from IPython.core.display import HTML as Center
 from utilities import *
-from config import marker, start_date, end_date, demographics, codelist_code_column, codelist_term_column
+from config import marker, start_date, end_date, demographics, codelist_code_column, codelist_term_column, codelist_path
 
 
 %matplotlib inline
@@ -142,7 +142,7 @@ for key, value in measures_dict.items():
 
 
 
-codelist = pd.read_csv('../codelists/opensafely-structured-medication-review-nhs-england.csv')
+codelist = pd.read_csv(f'../{codelist_path}')
 
 """
 
