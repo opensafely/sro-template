@@ -32,10 +32,9 @@ sro-template as a template.
 2.  Create or select codelist on [OpenSAFELY Codelists](https://codelists.opensafely.org/).
 Instructions on how to do this can be found [in this documentation](https://docs.opensafely.org/en/latest/codelist-creation/)
 4.  [Add the codelist to your project](https://docs.opensafely.org/en/latest/codelist-project/).
-5.  In `codelists.py` in the analysis folder, change the filename arguemnt in `codelist` to match the filename of your newly created codelist.
-6.  Make changes to the study variables in `config.py` in the analysis folder.
-7.  Update the `--index-date-range` in `project.yaml` to match the dates defined in step 6.
-8.  This code can then be [run locally](https://docs.opensafely.org/en/latest/actions-pipelines/#running-your-code-locally) using the command `opensafely run run_all`
-9.  For instructions on how to run this code against real data [see this documentation](https://docs.opensafely.org/en/latest/job-server/).
+5.  Make changes to the study variables in `config.py` in the analysis folder.
+6.  Update the `--index-date-range` in `project.yaml` to match the dates defined in step 6.
+7.  This code can then be [run locally](https://docs.opensafely.org/en/latest/actions-pipelines/#running-your-code-locally) using the command `opensafely run run_all`
+8.  For instructions on how to run this code against real data [see this documentation](https://docs.opensafely.org/en/latest/job-server/).
 
 
