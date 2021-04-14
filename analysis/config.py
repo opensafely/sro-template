@@ -11,6 +11,9 @@ demographics = ["sex", "age_band", "region", "imd", "ethnicity", "learning_disab
 #name of measure
 marker="SMR"
 
+#codelist path
+codelist_path = "codelists/opensafely-structured-medication-review-nhs-england.csv"
+
 #column name referencing code in chosen codelist
 codelist_code_column="code"
 

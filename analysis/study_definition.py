@@ -1,6 +1,7 @@
 
 # Import functions
 import json
+import pandas as pd
 
 from cohortextractor import (
     StudyDefinition, 
@@ -13,9 +14,10 @@ from cohortextractor import (
 # Import codelists
 from codelists import codelist, ld_codes
 
-from config import start_date, end_date, demographics
+from config import start_date, end_date, demographics, codelist_code_column, codelist_path
 
-
+codelist_df = pd.read_csv(codelist_path)
+codelist_expectation_codes = codelist_df[codelist_code_column].unique()[0]
 
 
 # Specifiy study defeinition
@@ -168,7 +170,7 @@ study = StudyDefinition(
         between=["index_date", "last_day_of_month(index_date)"],
         returning="code",
         return_expectations={"category": {
-            "ratios": {"1239511000000100": 1}}, }
+            "ratios": {codelist_expectation_codes: 1}}, }
     ),
     
 )
