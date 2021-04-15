@@ -1,6 +1,6 @@
 # OpenSAFELY Service Restoration Observatory (SRO) Template
 
-This is a template repository for making new OpenSAFELY SRO resarch projects.
+This is a template repository for making new OpenSAFELY SRO research projects.
 
 # About the OpenSAFELY framework
 
