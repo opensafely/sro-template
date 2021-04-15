@@ -17,6 +17,8 @@ codelist_path = "codelists/opensafely-atrial-fibrillation-clinical-finding.csv"
 #column name referencing code in chosen codelist
 codelist_code_column="CTV3Code"
 
+#codelist system for chosen codelist
 codelist_system = "ctv3"
+
 #column name referencing code descriptions in chosen codelist
 codelist_term_column='Description'
