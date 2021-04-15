@@ -429,10 +429,10 @@ def calculate_statistics_demographics(df, demographic_var, end_date, event_colum
         df_subset_total = df[df[demographic_var] == category]
         events_total = df_subset_total[event_column].sum()
         
-        df_subset_year = df[df['date'] > year_before]
+        df_subset_year = df_subset_total[df_subset_total['date'] > year_before]
         events_year = df_subset_year[event_column].sum()
 
-        df_subset_months_3 = df[df['date'] > months_3_before]
+        df_subset_months_3 = df_subset_total[df_subset_total['date'] > months_3_before]
         events_months_3 = df_subset_months_3[event_column].sum()
 
         output_dict[category] = {"total": events_total, "year": events_year, "months_3": events_months_3}
