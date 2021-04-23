@@ -36,7 +36,7 @@ study = StudyDefinition(
         registered AND
         (NOT died) AND
         (sex = 'F' OR sex='M') AND
-        (age != 'missing')
+        (age_band != 'missing')
         """,
 
         registered=patients.registered_as_of(
