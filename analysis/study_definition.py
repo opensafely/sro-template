@@ -36,7 +36,7 @@ study = StudyDefinition(
         registered AND
         (NOT died) AND
         (sex = 'F' OR sex='M') AND
-        (age != 'missing')
+        (age_band != 'missing')
         """,
 
         registered=patients.registered_as_of(
@@ -61,54 +61,32 @@ study = StudyDefinition(
 
     age_band=patients.categorised_as(
         {
-            "0-4": "age >= 0 AND age < 5",
-            "5-9": "age >= 5 AND age < 10",
-            "10-14": "age >= 10 AND age < 15",
-            "15-19": "age >= 15 AND age < 20",
-            "20-24": "age >= 20 AND age < 25",
-            "25-29": "age >= 25 AND age < 30",
-            "30-34": "age >= 30 AND age < 35",
-            "35-39": "age >= 35 AND age < 40",
-            "40-44": "age >= 40 AND age < 45",
-            "45-49": "age >= 45 AND age < 50",
-            "50-54": "age >= 50 AND age < 55",
-            "55-59": "age >= 55 AND age < 60",
-            "60-64": "age >= 60 AND age < 65",
-            "65-69": "age >= 65 AND age < 70",
-            "70-74": "age >= 70 AND age < 75",
-            "75-79": "age >= 75 AND age < 80",
-            "80-84": "age >= 80 AND age < 85",
-            "85-89": "age >= 85 AND age < 90",
-            "90plus": "age >= 90",
             "missing": "DEFAULT",
+            "0-19": """ age >= 0 AND age < 20""",
+            "20-29": """ age >=  20 AND age < 30""",
+            "30-39": """ age >=  30 AND age < 40""",
+            "40-49": """ age >=  40 AND age < 50""",
+            "50-59": """ age >=  50 AND age < 60""",
+            "60-69": """ age >=  60 AND age < 70""",
+            "70-79": """ age >=  70 AND age < 80""",
+            "80+": """ age >=  80 AND age < 120""",
         },
         return_expectations={
             "rate": "universal",
             "category": {
                 "ratios": {
-                    "0-4": 0.05,
-                    "5-9": 0.05,
-                    "10-14": 0.05,
-                    "15-19": 0.05,
-                    "20-24": 0.05,
-                    "25-29": 0.05,
-                    "30-34": 0.05,
-                    "35-39": 0.05,
-                    "40-44": 0.05,
-                    "45-49": 0.1,
-                    "50-54": 0.05,
-                    "55-59": 0.05,
-                    "60-64": 0.05,
-                    "65-69": 0.05,
-                    "70-74": 0.05,
-                    "75-79": 0.05,
-                    "80-84": 0.05,
-                    "85-89": 0.05,
-                    "90plus": 0.05,
-                    "missing": 0,
+                    "0-19": 0.125,
+                    "20-29": 0.125,
+                    "30-39": 0.125,
+                    "40-49": 0.125,
+                    "50-59": 0.125,
+                    "60-69": 0.125,
+                    "70-79": 0.125,
+                    "80+": 0.125,
                 }
             },
-        }
+        },
+
     ),
 
 

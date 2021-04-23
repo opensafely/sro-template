@@ -99,6 +99,34 @@ def calculate_rate(df, m, rate_per=1000, standardise=True, age_group_column="age
         
             
         standard_pop = pd.read_csv(path)
+
+        age_band_grouping_dict = {
+            '0-4 years': '0-19',
+            '5-9 years': '0-19',
+            '10-14 years': '0-19',
+            '15-19 years': '0-19',
+            '20-24 years': '20-29',
+            '25-29 years': '20-29',
+            '30-34 years': '30-39',
+            '35-39 years': '30-39',
+            '40-44 years': '40-49',
+            '45-49 years': '40-49',
+            '50-54 years': '50-59',
+            '55-59 years': '50-59',
+            '60-64 years': '60-69',
+            '65-69 years': '60-69',
+            '70-74 years': '70-79',
+            '75-79 years': '70-79',
+            '80-84 years': '80+',
+            '85-89 years': '80+',
+            '90plus years': '80+',
+        }
+
+        standard_pop.set_index('AgeGroup', inplace=True)
+        standard_pop = standard_pop.groupby(age_band_grouping_dict, axis=0).sum()
+        standard_pop = standard_pop.reset_index().rename(columns={'index': 'AgeGroup'})
+
+
         standard_pop["AgeGroup"] = standard_pop["AgeGroup"].str.replace(" years", "")
         standard_pop = standard_pop.set_index("AgeGroup")["EuropeanStandardPopulation"]
         standard_pop = standard_pop / standard_pop.sum()
