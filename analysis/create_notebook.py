@@ -172,7 +172,14 @@ md("## Total Number by GP Practice")
 """
 
 output_practice_plot = """\
-practice_df = pd.read_csv('../output/input_practice_count.csv')
+
+practice_files = []
+for file in os.listdir('../output'):
+    if file.startswith('input_practice_count'):
+        df = pd.read_csv(os.path.join('../output',file))
+        practice_files.append(df)
+
+practice_df = pd.concat(practice_files)
 practices_dict =calculate_statistics_practices(data_dict['practice'], practice_df,end_date)
 print(f'Practices included entire period: {practices_dict["total"]["number"]} ({practices_dict["total"]["percent"]}%)')
 print(f'Practices included within last year: {practices_dict["year"]["number"]} ({practices_dict["year"]["percent"]}%)')
