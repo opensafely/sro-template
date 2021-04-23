@@ -61,7 +61,7 @@ study = StudyDefinition(
 
     age_band=patients.categorised_as(
         {
-            "0": "DEFAULT",
+            "missing": "DEFAULT",
             "0-19": """ age >= 0 AND age < 20""",
             "20-29": """ age >=  20 AND age < 30""",
             "30-39": """ age >=  30 AND age < 40""",
@@ -75,8 +75,7 @@ study = StudyDefinition(
             "rate": "universal",
             "category": {
                 "ratios": {
-                    "0": 0.001,
-                    "0-19": 0.124,
+                    "0-19": 0.125,
                     "20-29": 0.125,
                     "30-39": 0.125,
                     "40-49": 0.125,
