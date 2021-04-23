@@ -124,7 +124,7 @@ def calculate_rate(df, m, rate_per=1000, standardise=True, age_group_column="age
 
         standard_pop.set_index('AgeGroup', inplace=True)
         standard_pop = standard_pop.groupby(age_band_grouping_dict, axis=0).sum()
-
+        standard_pop = standard_pop.reset_index().rename(columns={'index': 'AgeGroup'})
 
 
         standard_pop["AgeGroup"] = standard_pop["AgeGroup"].str.replace(" years", "")
