@@ -17,6 +17,12 @@
       "url": "https://codelists.opensafely.org/codelist/opensafely/atrial-fibrillation-clinical-finding/2020-07-09/",
       "downloaded_at": "2021-04-15 08:38:26.280641Z",
       "sha": "edccc1a96570988b7e92a7a6e44cdee70a0ac179"
+    },
+    "opensafely-structured-medication-review-nhs-england.csv": {
+      "id": "opensafely/structured-medication-review-nhs-england/5459205f",
+      "url": "https://codelists.opensafely.org/codelist/opensafely/structured-medication-review-nhs-england/5459205f/",
+      "downloaded_at": "2021-05-10 15:47:23.153812Z",
+      "sha": "7bd4843c423ef7618c6d8f27164dc0939f2c9a9a"
     }
   }
 }

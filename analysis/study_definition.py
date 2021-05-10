@@ -134,6 +134,13 @@ study = StudyDefinition(
         returning="binary_flag",
         return_expectations={"incidence": 0.01, },
     ),
+    
+    care_home_status=patients.with_these_clinical_events(
+        nhse_care_homes_codes,
+        returning="binary_flag",
+        on_or_before="index_date",
+        return_expectations={"incidence": 0.2}
+    ),
 
 
     event =patients.with_these_clinical_events(
