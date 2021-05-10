@@ -33,7 +33,7 @@ sro-template as a template.
 Instructions on how to do this can be found [in this documentation](https://docs.opensafely.org/en/latest/codelist-creation/)
 4.  [Add the codelist to your project](https://docs.opensafely.org/en/latest/codelist-project/).
 5.  Make changes to the study variables in `config.py` in the analysis folder.
-6.  Update the `--index-date-range` in `project.yaml` to match the dates defined in step 4.
+6.  Update the `--index-date-range` in `project.yaml` to match the dates defined in step 4 in the  `generate_study_population` and `generate_study_population_practice_count` actions.
 7.  This code can then be [run locally](https://docs.opensafely.org/en/latest/actions-pipelines/#running-your-code-locally) using the command `opensafely run run_all`
 8.  For instructions on how to run this code against real data [see this documentation](https://docs.opensafely.org/en/latest/job-server/).
 
