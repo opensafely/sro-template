@@ -2,3 +2,4 @@ opensafely/ethnicity/2020-04-27
 opensafely/learning-disabilities/2020-07-06
 opensafely/atrial-fibrillation-clinical-finding/2020-07-09
 opensafely/structured-medication-review-nhs-england/5459205f
+opensafely/nhs-england-care-homes-residential-status/3712ef13

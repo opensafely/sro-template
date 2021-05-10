@@ -9,7 +9,7 @@ end_date = "2021-12-01"
 demographics = ["sex", "age_band", "region", "imd", "ethnicity", "learning_disability", "care_home_status"]
 
 #name of measure
-marker="ACE Inhibitors"
+marker="Atrial Fibrillation"
 
 #codelist path
 codelist_path = "codelists/opensafely-atrial-fibrillation-clinical-finding.csv"
