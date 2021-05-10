@@ -12,7 +12,7 @@ from cohortextractor import (
 )
 
 # Import codelists
-from codelists import codelist, ld_codes
+from codelists import codelist, ld_codes, nhse_care_homes_codes
 
 from config import start_date, end_date, demographics, codelist_code_column, codelist_path
 
@@ -133,6 +133,13 @@ study = StudyDefinition(
         on_or_before="index_date",
         returning="binary_flag",
         return_expectations={"incidence": 0.01, },
+    ),
+    
+    care_home_status=patients.with_these_clinical_events(
+        nhse_care_homes_codes,
+        returning="binary_flag",
+        on_or_before="index_date",
+        return_expectations={"incidence": 0.2}
     ),
 
 
