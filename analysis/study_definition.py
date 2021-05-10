@@ -12,7 +12,7 @@ from cohortextractor import (
 )
 
 # Import codelists
-from codelists import codelist, ld_codes
+from codelists import codelist, ld_codes, nhse_care_homes_codes
 
 from config import start_date, end_date, demographics, codelist_code_column, codelist_path
 
