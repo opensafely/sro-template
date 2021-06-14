@@ -187,13 +187,18 @@ measures = [
 
 for d in demographics:
 
+    if d == imd:
+        apply_suppression = False
+    
+    else:
+        apply_suppression = True
     
     m = Measure(
         id=f'{d}_rate',
         numerator="event",
         denominator="population",
         group_by=[d],
-        small_number_suppression=True
+        small_number_suppression=apply_suppression
     )
     
     measures.append(m)
