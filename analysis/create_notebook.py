@@ -16,72 +16,67 @@ from IPython.display import HTML
 from IPython.display import Markdown as md
 from IPython.core.display import HTML as Center
 from utilities import *
-from config import marker, start_date, end_date, demographics, codelist_code_column, codelist_term_column, codelist_path
-
+from config import marker, start_date, end_date, demographics, codelist_path
+from ebmdatalab import charts
 
 %matplotlib inline
 
 
-Center('''<style>
-.output_png {
-    display: table-cell;
-    text-align: center;
-    vertical-align: middle;
-}
-</style>''')
-
 class Measure:
-  def __init__(self, id, numerator, denominator, group_by):
+  def __init__(self, id, numerator, denominator, group_by, small_number_suppression):
     self.id = id
     self.numerator = numerator
     self.denominator = denominator
     self.group_by = group_by
+    self.small_number_suppression = small_number_suppression
     
+
+# Create default measures
 measures = [
 
     Measure(
-        id="total",
+        id="event_code_rate",
         numerator="event",
         denominator="population",
-        group_by=["age_band"]
+        group_by=["event_code"],
+        small_number_suppression=True
     ),
 
     Measure(
-        id="event_code",
+        id="practice_rate",
         numerator="event",
         denominator="population",
-        group_by=["age_band","event_code"]
+        group_by=["practice"],
+        small_number_suppression=False
     ),
 
-    Measure(
-        id="practice",
-        numerator="event",
-        denominator="population",
-        group_by=["age_band","practice"]
-    ),
 
 
 ]
 
+
+#Add demographics measures
+
 for d in demographics:
-    if d=='age_band':
-        m = Measure(
-        id=d,
+
+    if d == 'imd':
+        apply_suppression = False
+    
+    else:
+        apply_suppression = True
+    
+    m = Measure(
+        id=f'{d}_rate',
         numerator="event",
         denominator="population",
-        group_by=["age_band"]
-        )
-        measures.append(m)
-    else:
-        m = Measure(
-            id=d,
-            numerator="event",
-            denominator="population",
-            group_by=["age_band", d]
-        )
-        measures.append(m)
+        group_by=[d],
+        small_number_suppression=apply_suppression
+    )
+    
+    measures.append(m)
 
-default_measures = ['total', 'event_code', 'practice']
+
+default_measures = ['event_code', 'practice']
 measures_ids = default_measures+ demographics
 measures_dict = {}
 
@@ -110,7 +105,7 @@ md(f"All analytical code and output is available for inspection at the [OpenSAFE
 """
 
 get_data = """\
-default_measures = ['total', 'event_code', 'practice']
+default_measures = ['event_code', 'practice']
 measures = default_measures+ demographics
 
 data_dict = {}
@@ -118,33 +113,35 @@ data_dict = {}
 for key, value in measures_dict.items():
     
     df = pd.read_csv(f'../output/measure_{value.id}.csv')
-    if key == "event_code":
-        df.round(16)
     
+
     to_datetime_sort(df)
     
-    if value.id=='age_band':
-        data_dict[value.id] = calculate_rate(df, m=value, rate_per=1000, return_age=True)
-    elif key == "imd":
-       
-        df = calculate_rate(df, m=value, rate_per=1000)
-       
-        df_grouped = calculate_imd_group(df, 'event', 'rate_standardised')
+
+    if key == "imd":
+        df = calculate_imd_group(df, 'event', 'rate_standardised')
         
-        data_dict[value.id] = df_grouped
-    
     elif key == "ethnicity":
         df = convert_ethnicity(df)
-        data_dict[value.id] = calculate_rate(df, m=value, rate_per=1000)
-
-    else:
-        data_dict[value.id] = calculate_rate(df, m=value, rate_per=1000)
-
-
-
-
+        
+    df = calculate_rate(df, numerator=value.numerator, denominator=value.denominator, rate_per=1000)
+    
+    if key == "imd":
+        df = redact_small_numbers(df, 5, value.numerator, value.denominator, 'rate')
+    
+    
+    # get total population rate
+    if value.id=='practice_rate':
+        
+        df = drop_irrelevant_practices(df)
+        
+        df_total = df.groupby(by='date')[[value.numerator, value.denominator]].sum().reset_index()
+        df_total = calculate_rate(df_total, numerator=value.numerator, denominator=value.denominator, rate_per=1000)
+        data_dict['total'] = df_total
+    
+    data_dict[value.id] = df
+    
 codelist = pd.read_csv(f'../{codelist_path}')
-
 """
 
 output_total_title = """\
@@ -161,7 +158,7 @@ output_event_codes = """\
 display(
 md("### Sub totals by sub codes"),
 md("Events for the top 5 subcodes across the study period"))
-child_table = create_child_table(df=data_dict['event_code'], code_df=codelist, code_column=codelist_code_column, term_column=codelist_term_column)
+child_table = create_child_table(df=data_dict['event_code_rate'], code_df=codelist, code_column='code', term_column='term')
 child_table
     """
 
@@ -180,11 +177,20 @@ for file in os.listdir('../output'):
         practice_files.append(df)
 
 practice_df = pd.concat(practice_files)
-practices_dict =calculate_statistics_practices(data_dict['practice'], practice_df,end_date)
+practices_dict =calculate_statistics_practices(data_dict['practice_rate'], practice_df,end_date)
 print(f'Practices included entire period: {practices_dict["total"]["number"]} ({practices_dict["total"]["percent"]}%)')
 print(f'Practices included within last year: {practices_dict["year"]["number"]} ({practices_dict["year"]["percent"]}%)')
 print(f'Practices included within last 3 months: {practices_dict["months_3"]["number"]} ({practices_dict["months_3"]["percent"]}%)')
-interactive_deciles_chart(data_dict['practice'], period_column='date', column='event', title='Decile chart',ylabel='rate per 1000')
+
+charts.deciles_chart(
+        data_dict['practice_rate'],
+        period_column='date',
+        column='event',
+        title='Decile Chart',
+        ylabel='rate per 1000',
+        show_outer_percentiles=False,
+        show_legend=True,
+)
 """
 
 nb['cells'] = [
@@ -210,13 +216,12 @@ for d in range(len(demographics)):
     display(
     md(f"## Breakdown by {demographics[i]}")
     )
-    counts_df = calculate_statistics_demographics(df=data_dict[demographics[i]], demographic_var=demographics[i], end_date=end_date, event_column='event')
-    counts_df
+   
     """
     nb['cells'].append(nbf.v4.new_code_cell(cell_counts))
     
     cell_plot = """\
-    plot_measures(data_dict[demographics[i]], title=f'Breakdown by {demographics[i]}', column_to_plot='rate_standardised', category=demographics[i], y_label='Standardised Rate per 1000')
+    plot_measures(data_dict[f'{demographics[i]}_rate'], title=f'Breakdown by {demographics[i]}', column_to_plot='rate', category=demographics[i], y_label='Rate per 1000')
     i+=1
     """
     nb['cells'].append(nbf.v4.new_code_cell(cell_plot))

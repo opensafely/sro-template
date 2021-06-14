@@ -175,7 +175,8 @@ measures = [
         id="practice_rate",
         numerator="event",
         denominator="population",
-        group_by=["practice"]
+        group_by=["practice"],
+        small_number_suppression=False
     ),
 
 
@@ -187,7 +188,7 @@ measures = [
 
 for d in demographics:
 
-    if d == imd:
+    if d == 'imd':
         apply_suppression = False
     
     else:
