@@ -14,10 +14,10 @@ from cohortextractor import (
 # Import codelists
 from codelists import codelist, ld_codes, nhse_care_homes_codes
 
-from config import start_date, end_date, demographics, codelist_code_column, codelist_path
+from config import start_date, end_date, codelist_path, demographics
 
 codelist_df = pd.read_csv(codelist_path)
-codelist_expectation_codes = codelist_df[codelist_code_column].unique()[0]
+codelist_expectation_codes = codelist_df['code'].unique()
 
 
 # Specifiy study defeinition
@@ -155,7 +155,7 @@ study = StudyDefinition(
         between=["index_date", "last_day_of_month(index_date)"],
         returning="code",
         return_expectations={"category": {
-            "ratios": {codelist_expectation_codes: 1}}, }
+            "ratios": {x: 1/len(codelist_expectation_codes) for x in codelist_expectation_codes}}, }
     ),
     
 )
@@ -164,21 +164,21 @@ study = StudyDefinition(
 measures = [
 
     Measure(
-        id="total",
+        id="total_rate",
         numerator="event",
         denominator="population",
         group_by=["age_band"]
     ),
 
     Measure(
-        id="event_code",
+        id="event_code_rate",
         numerator="event",
         denominator="population",
         group_by=["age_band","event_code"]
     ),
 
     Measure(
-        id="practice",
+        id="practice_rate",
         numerator="event",
         denominator="population",
         group_by=["age_band","practice"]
@@ -195,7 +195,7 @@ for d in demographics:
 
     if d=='age_band':
         m = Measure(
-        id=d,
+        id=f'{d}_rate',
         numerator="event",
         denominator="population",
         group_by=["age_band"]
@@ -208,7 +208,7 @@ for d in demographics:
     else:
 
         m = Measure(
-            id=d,
+            id=f'{d}_rate',
             numerator="event",
             denominator="population",
             group_by=["age_band", d]

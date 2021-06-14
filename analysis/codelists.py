@@ -1,11 +1,8 @@
 from cohortextractor import codelist_from_csv
-from config import codelist_path, codelist_system, codelist_code_column
+from config import codelist_path
 
 # Change the path of the codelist to your chosen codelist
-codelist = codelist_from_csv(codelist_path,
-                              system=codelist_system,
-                              column=codelist_code_column,)
-
+codelist = codelist_from_csv(codelist_path, system='snomed')
 
 ethnicity_codes = codelist_from_csv(
         "codelists/opensafely-ethnicity.csv",
