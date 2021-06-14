@@ -1,11 +1,3 @@
-import nbformat as nbf
-from config import demographics
-
-
-nb = nbf.v4.new_notebook()
-
-
-imports = """\
 import sys
 import pandas as pd
 import numpy as np
@@ -19,7 +11,7 @@ from utilities import *
 from config import marker, start_date, end_date, demographics, codelist_path
 from ebmdatalab import charts
 
-%matplotlib inline
+get_ipython().run_line_magic("matplotlib", " inline")
 
 
 class Measure:
@@ -86,25 +78,25 @@ for m in measures:
 
 
 
-"""
 
-header = """\
+
+
 display(
 md("# Service Restoration Observatory"),
 md(f"## Changes in {marker} between {start_date} and {end_date}"),
 md(f"Below are various time-series graphs showing changes in {marker} code use."),
 )
-"""
 
-methods = """\
+
+
 display(
 md("### Methods"),
 md(f"Using OpenSAFELY-TPP, covering 40% of England's population, we have assessed coding activity related to {marker} between {start_date} and {end_date}. The codelist used can be found here at [OpenSAFELY Codelists](https://codelists.opensafely.org/).  For each month within the study period, we have calculated the rate at which the code was recorded per 1000 registered patients."),
 md(f"All analytical code and output is available for inspection at the [OpenSAFELY GitHub repository](https://github.com/opensafely")
 )
-"""
 
-get_data = """\
+
+
 default_measures = ['event_code', 'practice']
 measures = default_measures+ demographics
 
@@ -112,7 +104,10 @@ data_dict = {}
 
 for key, value in measures_dict.items():
     
-    df = pd.read_csv(f'../output/measure_{value.id}.csv', parse_dates='date').sort_values(by='date')
+    df = pd.read_csv(f'../output/measure_{value.id}.csv')
+    
+
+    to_datetime_sort(df)
     
 
     if key == "imd":
@@ -139,33 +134,33 @@ for key, value in measures_dict.items():
     data_dict[value.id] = df
     
 codelist = pd.read_csv(f'../{codelist_path}')
-"""
 
-output_total_title = """\
+
+
 display(
 md(f"## Total {marker} Number")
 )
-"""
 
-output_total_plot = """\
+
+
 plot_measures(data_dict['total'], title=f"Total {marker} across whole population", column_to_plot='rate', category=False, y_label='Rate per 1000')
-"""
 
-output_event_codes = """\
+
+
 display(
 md("### Sub totals by sub codes"),
 md("Events for the top 5 subcodes across the study period"))
 child_table = create_child_table(df=data_dict['event_code_rate'], code_df=codelist, code_column='code', term_column='term')
 child_table
-    """
+    
 
-output_practice_title = """\
+
 display(
 md("## Total Number by GP Practice")
 )
-"""
 
-output_practice_plot = """\
+
+
 
 practice_files = []
 for file in os.listdir('../output'):
@@ -175,9 +170,9 @@ for file in os.listdir('../output'):
 
 practice_df = pd.concat(practice_files)
 practices_dict =calculate_statistics_practices(data_dict['practice_rate'], practice_df,end_date)
-print(f'Practices included entire period: {practices_dict["total"]["number"]} ({practices_dict["total"]["percent"]}%)')
-print(f'Practices included within last year: {practices_dict["year"]["number"]} ({practices_dict["year"]["percent"]}%)')
-print(f'Practices included within last 3 months: {practices_dict["months_3"]["number"]} ({practices_dict["months_3"]["percent"]}%)')
+print(f'Practices included entire period: {practices_dict["total"]["number"]} ({practices_dict["total"]["percent"]}get_ipython().run_line_magic(")')", "")
+print(f'Practices included within last year: {practices_dict["year"]["number"]} ({practices_dict["year"]["percent"]}get_ipython().run_line_magic(")')", "")
+print(f'Practices included within last 3 months: {practices_dict["months_3"]["number"]} ({practices_dict["months_3"]["percent"]}get_ipython().run_line_magic(")')", "")
 
 charts.deciles_chart(
         data_dict['practice_rate'],
@@ -188,40 +183,92 @@ charts.deciles_chart(
         show_outer_percentiles=False,
         show_legend=True,
 )
-"""
 
-nb['cells'] = [
-    nbf.v4.new_code_cell(imports),
-    nbf.v4.new_code_cell(header),
-    nbf.v4.new_code_cell(methods),
-    nbf.v4.new_code_cell(get_data),
-    nbf.v4.new_code_cell(output_total_title),
-    nbf.v4.new_code_cell(output_total_plot),
-    nbf.v4.new_code_cell(output_event_codes),
-    nbf.v4.new_code_cell(output_practice_title),
-    nbf.v4.new_code_cell(output_practice_plot),
-    ]
 
-counter = """\
+
 i=0
-"""
 
-nb['cells'].append(nbf.v4.new_code_cell(counter))
 
-for d in range(len(demographics)):
-    cell_counts = """\
+
     display(
     md(f"## Breakdown by {demographics[i]}")
     )
    
-    """
-    nb['cells'].append(nbf.v4.new_code_cell(cell_counts))
     
-    cell_plot = """\
+
+
     plot_measures(data_dict[f'{demographics[i]}_rate'], title=f'Breakdown by {demographics[i]}', column_to_plot='rate', category=demographics[i], y_label='Rate per 1000')
     i+=1
-    """
-    nb['cells'].append(nbf.v4.new_code_cell(cell_plot))
+    
 
 
-nbf.write(nb, 'analysis/SRO_Notebook.ipynb')
+    display(
+    md(f"## Breakdown by {demographics[i]}")
+    )
+   
+    
+
+
+    plot_measures(data_dict[f'{demographics[i]}_rate'], title=f'Breakdown by {demographics[i]}', column_to_plot='rate', category=demographics[i], y_label='Rate per 1000')
+    i+=1
+    
+
+
+    display(
+    md(f"## Breakdown by {demographics[i]}")
+    )
+   
+    
+
+
+    plot_measures(data_dict[f'{demographics[i]}_rate'], title=f'Breakdown by {demographics[i]}', column_to_plot='rate', category=demographics[i], y_label='Rate per 1000')
+    i+=1
+    
+
+
+    display(
+    md(f"## Breakdown by {demographics[i]}")
+    )
+   
+    
+
+
+    plot_measures(data_dict[f'{demographics[i]}_rate'], title=f'Breakdown by {demographics[i]}', column_to_plot='rate', category=demographics[i], y_label='Rate per 1000')
+    i+=1
+    
+
+
+    display(
+    md(f"## Breakdown by {demographics[i]}")
+    )
+   
+    
+
+
+    plot_measures(data_dict[f'{demographics[i]}_rate'], title=f'Breakdown by {demographics[i]}', column_to_plot='rate', category=demographics[i], y_label='Rate per 1000')
+    i+=1
+    
+
+
+    display(
+    md(f"## Breakdown by {demographics[i]}")
+    )
+   
+    
+
+
+    plot_measures(data_dict[f'{demographics[i]}_rate'], title=f'Breakdown by {demographics[i]}', column_to_plot='rate', category=demographics[i], y_label='Rate per 1000')
+    i+=1
+    
+
+
+    display(
+    md(f"## Breakdown by {demographics[i]}")
+    )
+   
+    
+
+
+    plot_measures(data_dict[f'{demographics[i]}_rate'], title=f'Breakdown by {demographics[i]}', column_to_plot='rate', category=demographics[i], y_label='Rate per 1000')
+    i+=1
+    

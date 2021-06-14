@@ -8,10 +8,6 @@ import os
 from urllib.request import urlopen
 from pandas.api.types import is_numeric_dtype
 
-def to_datetime_sort(df):
-    
-    df['date'] = pd.to_datetime(df['date'])
-    df = df.sort_values(by='date')
 
 def calculate_imd_group(df, disease_column, rate_column):
     imd_column = pd.to_numeric(df["imd"])
