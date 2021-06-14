@@ -164,24 +164,18 @@ study = StudyDefinition(
 measures = [
 
     Measure(
-        id="total_rate",
-        numerator="event",
-        denominator="population",
-        group_by=["age_band"]
-    ),
-
-    Measure(
         id="event_code_rate",
         numerator="event",
         denominator="population",
-        group_by=["age_band","event_code"]
+        group_by=["event_code"],
+        small_number_suppression=True
     ),
 
     Measure(
         id="practice_rate",
         numerator="event",
         denominator="population",
-        group_by=["age_band","practice"]
+        group_by=["practice"]
     ),
 
 
@@ -193,21 +187,15 @@ measures = [
 
 for d in demographics:
 
-    if d=='age_band':
-        m = Measure(
+    
+    m = Measure(
         id=f'{d}_rate',
         numerator="event",
         denominator="population",
-        group_by=["age_band"]
+        group_by=[d],
+        small_number_suppression=True
     )
-        measures.append(m)
     
-    else:
+    measures.append(m)
 
-        m = Measure(
-            id=f'{d}_rate',
-            numerator="event",
-            denominator="population",
-            group_by=["age_band", d]
-        )
-        measures.append(m)
+    
