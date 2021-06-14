@@ -12,11 +12,11 @@
       "downloaded_at": "2021-04-13 15:03:59.415279Z",
       "sha": "ab5b5f60e8525af5898ec1066fc820501b8e5e29"
     },
-    "opensafely-atrial-fibrillation-clinical-finding.csv": {
-      "id": "opensafely/atrial-fibrillation-clinical-finding/2020-07-09",
-      "url": "https://codelists.opensafely.org/codelist/opensafely/atrial-fibrillation-clinical-finding/2020-07-09/",
-      "downloaded_at": "2021-04-15 08:38:26.280641Z",
-      "sha": "edccc1a96570988b7e92a7a6e44cdee70a0ac179"
+    "opensafely-systolic-blood-pressure-qof.csv": {
+      "id": "opensafely/systolic-blood-pressure-qof/3572b5fb",
+      "url": "https://codelists.opensafely.org/codelist/opensafely/systolic-blood-pressure-qof/3572b5fb/",
+      "downloaded_at": "2021-06-14 13:15:20.607476Z",
+      "sha": "f2bc461e351499f4e5573a6f94e760b99979491e"
     },
     "opensafely-structured-medication-review-nhs-england.csv": {
       "id": "opensafely/structured-medication-review-nhs-england/5459205f",

@@ -14,10 +14,10 @@ from cohortextractor import (
 # Import codelists
 from codelists import codelist, ld_codes, nhse_care_homes_codes
 
-from config import start_date, end_date, demographics, codelist_code_column, codelist_path
+from config import start_date, end_date, codelist_path, demographics
 
 codelist_df = pd.read_csv(codelist_path)
-codelist_expectation_codes = codelist_df[codelist_code_column].unique()[0]
+codelist_expectation_codes = codelist_df['code'].unique()
 
 
 # Specifiy study defeinition
@@ -155,7 +155,7 @@ study = StudyDefinition(
         between=["index_date", "last_day_of_month(index_date)"],
         returning="code",
         return_expectations={"category": {
-            "ratios": {codelist_expectation_codes: 1}}, }
+            "ratios": {x: 1/len(codelist_expectation_codes) for x in codelist_expectation_codes}}, }
     ),
     
 )
@@ -164,24 +164,19 @@ study = StudyDefinition(
 measures = [
 
     Measure(
-        id="total",
+        id="event_code_rate",
         numerator="event",
         denominator="population",
-        group_by=["age_band"]
+        group_by=["event_code"],
+        small_number_suppression=True
     ),
 
     Measure(
-        id="event_code",
+        id="practice_rate",
         numerator="event",
         denominator="population",
-        group_by=["age_band","event_code"]
-    ),
-
-    Measure(
-        id="practice",
-        numerator="event",
-        denominator="population",
-        group_by=["age_band","practice"]
+        group_by=["practice"],
+        small_number_suppression=False
     ),
 
 
@@ -193,26 +188,20 @@ measures = [
 
 for d in demographics:
 
-    if d=='age_band':
-        m = Measure(
-        id=d,
+    if d == 'imd':
+        apply_suppression = False
+    
+    else:
+        apply_suppression = True
+    
+    m = Measure(
+        id=f'{d}_rate',
         numerator="event",
         denominator="population",
-        group_by=["age_band"]
+        group_by=[d],
+        small_number_suppression=apply_suppression
     )
-        measures.append(m)
-    elif d=="ethnicity":
-        pass
+    
+    measures.append(m)
 
-   
-    else:
-
-        m = Measure(
-            id=d,
-            numerator="event",
-            denominator="population",
-            group_by=["age_band", d]
-        )
-        measures.append(m)
-
-
+    

@@ -37,14 +37,7 @@ actions:
       needs: [join_ethnicity]
       outputs:
         moderately_sensitive:
-          measure_csv: output/measure_*.csv
-
-  generate_measure_ethnicity:
-    run: python:latest python analysis/generate_measure_ethnicity.py
-    needs: [join_ethnicity]
-    outputs:
-      moderately_sensitive:
-        measure: output/measure_ethnicity.csv
+          measure_csv: output/measure_*_rate.csv
 
   get_patient_count:
     run: python:latest python analysis/get_patients_counts.py
@@ -63,7 +56,7 @@ actions:
 
   generate_notebook:
     run: jupyter:latest jupyter nbconvert /workspace/analysis/SRO_Notebook.ipynb --execute --to html --output-dir=/workspace/output --ExecutePreprocessor.timeout=86400 --no-input
-    needs: [create_notebook, generate_measures, generate_measure_ethnicity, generate_study_population_practice_count, generate_study_population, join_ethnicity]
+    needs: [create_notebook, generate_measures, generate_study_population_practice_count, generate_study_population, join_ethnicity]
     outputs:
       moderately_sensitive:
         notebook: output/SRO_Notebook.html
