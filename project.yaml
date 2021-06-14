@@ -60,4 +60,9 @@ actions:
     outputs:
       moderately_sensitive:
         notebook: output/SRO_Notebook.html
-        
+
+  run_tests:
+    run: python:latest python -m pytest --junit-xml=output/pytest.xml --verbose
+    outputs:
+      moderately_sensitive:
+        log: output/pytest.xml
