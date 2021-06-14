@@ -1,7 +1,6 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-import plotly.graph_objects as go
 import json
 import datetime
 from dateutil.relativedelta import relativedelta
@@ -106,92 +105,32 @@ def calculate_rate(df, m, rate_per=1000, age_group_column="age_band", return_age
 
 
 
-def plot_measures(df, title, column_to_plot, category=False, y_label='Rate per 1000', interactive=True):
+def plot_measures(df, title, column_to_plot, category=False, y_label='Rate per 1000'):
 
-    if interactive:
+    if category:
+        for unique_category in df[category].unique():
 
-        fig = go.Figure()
+            df_subset = df[df[category] == unique_category]
 
-        if category:
-            for unique_category in df[category].unique():
+            plt.plot(df_subset['date'], df_subset[column_to_plot], marker='o')
+    else:
+        plt.plot(df['date'], df[column_to_plot], marker='o')
 
-                df_subset = df[df[category] == unique_category]
-                fig.add_trace(go.Scatter(
-                    x=df_subset['date'], y=df_subset[column_to_plot], name=str(unique_category)))
+    plt.ylabel(y_label)
+    plt.xlabel('Date')
+    plt.xticks(rotation='vertical')
+    plt.title(title)
 
-        else:
-            fig.add_trace(go.Scatter(
-                x=df['date'], y=df[column_to_plot]))
-
-        # Set title
-        fig.update_layout(
-            title_text=title,
-            hovermode='x',
-            title_x=0.5,
-
-
-        )
-
-        fig.update_yaxes(title=y_label)
-        fig.update_xaxes(title="Date")
-
-        # Add range slider
-        fig.update_layout(
-            xaxis=go.layout.XAxis(
-                rangeselector=dict(
-                    buttons=list([
-                        dict(count=1,
-                            label="1m",
-                            step="month",
-                            stepmode="backward"),
-                        dict(count=6,
-                            label="6m",
-                            step="month",
-                            stepmode="backward"),
-
-                        dict(count=1,
-                            label="1y",
-                            step="year",
-                            stepmode="backward"),
-                        dict(step="all")
-                    ])
-                ),
-                rangeslider=dict(
-                    visible=True
-                ),
-                type="date"
-            )
-        )
-
-        fig.show()
-        
+    if category:
+        plt.legend(df[category].unique(), bbox_to_anchor=(
+            1.04, 1), loc="upper left")
 
     else:
-
-        if category:
-            for unique_category in df[category].unique():
-
-                df_subset = df[df[category] == unique_category]
-
-                plt.plot(df_subset['date'], df_subset[column_to_plot], marker='o')
-        else:
-            plt.plot(df['date'], df[column_to_plot], marker='o')
-
-        plt.ylabel(y_label)
-        plt.xlabel('Date')
-        plt.xticks(rotation='vertical')
-        plt.title(title)
-
-        if category:
-            plt.legend(df[category].unique(), bbox_to_anchor=(
-                1.04, 1), loc="upper left")
-
-        else:
-            pass
+        pass
 
 
-        plt.show()
-        plt.clf()
+    plt.show()
+    plt.clf()
 
 
 
