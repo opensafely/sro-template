@@ -201,10 +201,7 @@ for d in demographics:
         group_by=["age_band"]
     )
         measures.append(m)
-    elif d=="ethnicity":
-        pass
-
-   
+    
     else:
 
         m = Measure(
@@ -214,5 +211,3 @@ for d in demographics:
             group_by=["age_band", d]
         )
         measures.append(m)
-
-

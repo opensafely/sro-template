@@ -81,93 +81,26 @@ def redact_small_numbers(df, n, counts_columns):
 
 
 
-def calculate_rate(df, m, rate_per=1000, standardise=True, age_group_column="age_band", return_age=False):
+def calculate_rate(df, m, rate_per=1000, age_group_column="age_band", return_age=False):
     num_per_thousand = df[m.numerator]/(df[m.denominator]/rate_per)
     df['rate'] = num_per_thousand
     
-    def standardise_row(row):
     
-        age_group = row[age_group_column]
-        rate = row['rate']
-        
-        
-        standardised_rate = rate * standard_pop.loc[str(age_group)]
-        return standardised_rate
-        
-    if standardise:
-        path = "european_standard_population.csv"
-        
-            
-        standard_pop = pd.read_csv(path)
 
-        age_band_grouping_dict = {
-            '0-4 years': '0-19',
-            '5-9 years': '0-19',
-            '10-14 years': '0-19',
-            '15-19 years': '0-19',
-            '20-24 years': '20-29',
-            '25-29 years': '20-29',
-            '30-34 years': '30-39',
-            '35-39 years': '30-39',
-            '40-44 years': '40-49',
-            '45-49 years': '40-49',
-            '50-54 years': '50-59',
-            '55-59 years': '50-59',
-            '60-64 years': '60-69',
-            '65-69 years': '60-69',
-            '70-74 years': '70-79',
-            '75-79 years': '70-79',
-            '80-84 years': '80+',
-            '85-89 years': '80+',
-            '90plus years': '80+',
-        }
+    if return_age:
+        df_count = df.groupby(by=["date"] + m.group_by)[[m.numerator, m.denominator]].sum().reset_index()
 
-        standard_pop.set_index('AgeGroup', inplace=True)
-        standard_pop = standard_pop.groupby(age_band_grouping_dict, axis=0).sum()
-        standard_pop = standard_pop.reset_index().rename(columns={'index': 'AgeGroup'})
+        df_rate = df.groupby(by=["date"]+m.group_by)[['rate']].mean().reset_index()
 
-
-        standard_pop["AgeGroup"] = standard_pop["AgeGroup"].str.replace(" years", "")
-        standard_pop = standard_pop.set_index("AgeGroup")["EuropeanStandardPopulation"]
-        standard_pop = standard_pop / standard_pop.sum()
-        
-        #apply standardisation
-        df['rate_standardised'] = df.apply(standardise_row, axis=1)
-        
-        
-        if return_age:
-            df_count = df.groupby(by=["date"]+ m.group_by)[[m.numerator, m.denominator]].sum().reset_index()
-        
-        
-            df_rate = df.groupby(by=["date"]+m.group_by)[['rate', 'rate_standardised']].mean().reset_index()
-            
-            
-            df = df_count.merge(df_rate, on=["date"] + m.group_by, how="inner")
-        else:
-    
-            df_count = df.groupby(by=["date"]+ (lambda x: x[1:] if len(x)>1 else [])(m.group_by))[[m.numerator, m.denominator]].sum().reset_index()
-        
-        
-            df_rate = df.groupby(by=["date"]+(lambda x: x[1:] if len(x)>1 else [])(m.group_by))[['rate', 'rate_standardised']].mean().reset_index()
-            
-            
-            df = df_count.merge(df_rate, on=["date"] + (lambda x: x[1:] if len(x)>1 else [])(m.group_by), how="inner")
-           
-
-    
+        df = df_count.merge(df_rate, on=["date"] + m.group_by, how="inner")
     else:
-        if return_age:
-            df_count = df.groupby(by=["date"] + m.group_by)[[m.numerator, m.denominator]].sum().reset_index()
-            
-            df_rate = df.groupby(by=["date"]+m.group_by)[['rate']].mean().reset_index()
-            
-            df = df_count.merge(df_rate, on=["date"] + m.group_by, how="inner")
-        else:
-            df_count = df.groupby(by=["date"] + (lambda x: x[1:] if len(x)>1 else [])(m.group_by))[[m.numerator, m.denominator]].sum().reset_index()
-            
-            df_rate = df.groupby(by=["date"]+(lambda x: x[1:] if len(x)>1 else [])(m.group_by))[['rate']].mean().reset_index()
-            
-            df = df_count.merge(df_rate, on=["date"] + (lambda x: x[1:] if len(x)>1 else [])(m.group_by), how="inner")
+        df_count = df.groupby(by=["date"] + (lambda x: x[1:] if len(x)>1 else [])(m.group_by))[[m.numerator, m.denominator]].sum().reset_index()
+
+        df_rate = df.groupby(by=["date"]+(lambda x: x[1:] if len(x)>1 else [])(m.group_by))[['rate']].mean().reset_index()
+
+        df = df_count.merge(df_rate, on=["date"] + (lambda x: x[1:] if len(x)>1 else [])(m.group_by), how="inner")
+        
+        
     return df
         
 
@@ -540,16 +473,4 @@ def interactive_deciles_chart(
     )
 
     fig.show()
-
-
-path = "european_standard_population.csv"
-## European standardisation data from:
-# from urllib.request import urlopen
-# url = "https://www.opendata.nhs.scot/dataset/4dd86111-7326-48c4-8763-8cc4aa190c3e/resource/edee9731-daf7-4e0d-b525-e4c1469b8f69/download/european_standard_population.csv"
-# with urlopen(url) as f:
-#     pd.read_csv(f).to_csv(path, index=False)
-standard_pop = pd.read_csv(path)
-standard_pop["AgeGroup"] = standard_pop["AgeGroup"].str.replace(" years", "")
-standard_pop = standard_pop.set_index("AgeGroup")["EuropeanStandardPopulation"]
-standard_pop = standard_pop / standard_pop.sum()
 
