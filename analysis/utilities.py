@@ -30,15 +30,19 @@ def calculate_imd_group(df, disease_column, rate_column):
     return df_merged[['imd', disease_column, 'population', rate_column, 'date']]
 
 def redact_small_numbers(df, n, numerator, denominator, rate_column):
-    """
-    Takes counts df as input and suppresses low numbers.  Sequentially redacts
+    """Takes counts df as input and suppresses low numbers.  Sequentially redacts
     low numbers from numerator and denominator until count of redcted values >=n.
     Rates corresponding to redacted values are also redacted.
     
-    df: input df
-    n: threshold for low number suppression
-    numerator: numerator column to be redacted
-    denominator: denominator column to be redacted
+    Args:
+        df: measures dataframe
+        n: threshold for low number suppression
+        numerator: column name for numerator
+        denominator: column name for denominator
+        rate_column: column name for rate
+    
+    Returns:
+        Input dataframe with low numbers suppressed
     """
     
     def suppress_column(column):    
@@ -49,7 +53,7 @@ def redact_small_numbers(df, n, numerator, denominator, rate_column):
             pass
         
         else:
-            df.loc[df[column.name]<=n, column.name] = np.nan
+            column = column.replace([0, 1, 2, 3, 4, 5],np.nan)
             
 
             while suppressed_count <=n:
