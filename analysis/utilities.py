@@ -70,14 +70,34 @@ def redact_small_numbers(df, n, numerator, denominator, rate_column):
     return df    
 
 def convert_ethnicity(df):
+    """Converts the ethnicity of a dataframe from int to an understandable string.
+    
+    Args:
+        df: dataframe with ethnicity column
+    
+    Returns:
+        Input dataframe with converted ethnicity column
+    """
     ethnicity_codes = {1.0: "White", 2.0: "Mixed", 3.0: "Asian", 4.0: "Black", 5.0:"Other", np.nan: "unknown", 0: "unknown"}
-
     df = df.replace({"ethnicity": ethnicity_codes})
+
     return df
 
 def calculate_rate(df, numerator, denominator, rate_per=1000):
-    num_per_thousand = df[numerator]/(df[denominator]/rate_per)
-    df['rate'] = num_per_thousand
+    """Creates a rate column for a dataframe with a numerator and denominator column.
+    
+    Args:
+        df: measures dataframe
+        numerator: numerator for rate
+        denominator: denominator for rate
+        rate_per: unit for calculated rate
+    
+    Returns:
+        Input dataframe with additional rate column
+    """
+
+    rate = df[numerator]/(df[denominator]/rate_per)
+    df['rate'] = rate
     
     return df
         
