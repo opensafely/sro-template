@@ -113,8 +113,9 @@ def drop_irrelevant_practices(df, practice_col):
 
 
 def create_child_table(
-    df, code_df, code_column, term_column, measure, nrows=5
+    df, code_df, code_column, term_column, nrows=5
 ):
+
     """
     Args:
         df: A measure table.
@@ -127,7 +128,7 @@ def create_child_table(
         A table of the top `nrows` codes.
     """
     event_counts = (
-        df.groupby(f"{measure}_event_code")[f"{measure}"]
+        df.groupby("event_code")["event"]
         .sum()  # We can't use .count() because the measure column contains zeros.
         .rename_axis(code_column)
         .rename("Events")
@@ -135,8 +136,9 @@ def create_child_table(
         .sort_values("Events", ascending=False)
     )
 
+    
     event_counts["Events (thousands)"] = event_counts["Events"] / 1000
-
+       
     # Gets the human-friendly description of the code for the given row
     # e.g. "Systolic blood pressure".
     code_df = code_df.set_index(code_column).rename(
@@ -146,10 +148,12 @@ def create_child_table(
         event_counts.set_index(code_column).join(code_df).reset_index()
     )
 
+    
     # Cast the code to an integer.
     event_counts[code_column] = event_counts[code_column].astype(int)
-
+    
     # return top n rows
+    
     return event_counts.iloc[:nrows, :]
 
 def get_number_practices(df):

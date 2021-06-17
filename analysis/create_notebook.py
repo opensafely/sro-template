@@ -112,13 +112,10 @@ data_dict = {}
 
 for key, value in measures_dict.items():
     
-    df = pd.read_csv(f'../output/measure_{value.id}.csv', parse_dates='date').sort_values(by='date')
+    df = pd.read_csv(f'../output/measure_{value.id}.csv', parse_dates=['date']).sort_values(by='date')
     
 
-    if key == "imd":
-        df = calculate_imd_group(df, 'event', 'rate_standardised')
-        
-    elif key == "ethnicity":
+    if key == "ethnicity":
         df = convert_ethnicity(df)
         
     df = calculate_rate(df, numerator=value.numerator, denominator=value.denominator, rate_per=1000)
@@ -130,7 +127,7 @@ for key, value in measures_dict.items():
     # get total population rate
     if value.id=='practice_rate':
         
-        df = drop_irrelevant_practices(df)
+        df = drop_irrelevant_practices(df, 'practice')
         
         df_total = df.groupby(by='date')[[value.numerator, value.denominator]].sum().reset_index()
         df_total = calculate_rate(df_total, numerator=value.numerator, denominator=value.denominator, rate_per=1000)
@@ -167,17 +164,8 @@ md("## Total Number by GP Practice")
 
 output_practice_plot = """\
 
-practice_files = []
-for file in os.listdir('../output'):
-    if file.startswith('input_practice_count'):
-        df = pd.read_csv(os.path.join('../output',file))
-        practice_files.append(df)
-
-practice_df = pd.concat(practice_files)
-practices_dict =calculate_statistics_practices(data_dict['practice_rate'], practice_df,end_date)
-print(f'Practices included entire period: {practices_dict["total"]["number"]} ({practices_dict["total"]["percent"]}%)')
-print(f'Practices included within last year: {practices_dict["year"]["number"]} ({practices_dict["year"]["percent"]}%)')
-print(f'Practices included within last 3 months: {practices_dict["months_3"]["number"]} ({practices_dict["months_3"]["percent"]}%)')
+percentage_practices = get_percentage_practices(data_dict['practice_rate'])
+md(f"Percentage of practices with a recording of a code within the codelist during the study period: {percentage_practices}%")
 
 charts.deciles_chart(
         data_dict['practice_rate'],

@@ -38,7 +38,7 @@ def measure_table():
     """Returns a measure table."""
     mt = pandas.DataFrame(
         {   
-            "event_event_code": pandas.Series([1, 1, 2, 1]),
+            "event_code": pandas.Series([1, 1, 2, 1]),
             "practice": pandas.Series([1, 2, 3, 4]),
             "group": pandas.Categorical(['A', 'B', 'A', 'B']),
             "event": pandas.Series([0, 6, 3, 7]),
@@ -106,7 +106,7 @@ def test_redact_small_numbers(measure_table):
     
     exp = pandas.DataFrame(
         {   
-            "event_event_code": pandas.Series([1, 1, 2, 1]),
+            "event_code": pandas.Series([1, 1, 2, 1]),
             "practice": pandas.Series([1, 2, 3, 4]),
             "group": pandas.Categorical(['A', 'B', 'A', 'B']),
             "event": pandas.Series([np.nan, np.nan, np.nan, 7]),
@@ -144,9 +144,9 @@ def test_create_child_table(measure_table, codelist_table_from_csv):
         codelist_table_from_csv,
         "code",
         "term",
-        "event",
     )
 
+   
     exp = pandas.DataFrame(
         [
             {
