@@ -165,7 +165,7 @@ md("## Total Number by GP Practice")
 output_practice_plot = """\
 
 percentage_practices = get_percentage_practices(data_dict['practice_rate'])
-md(f"Percentage of practices with a recording of a code within the codelist during the study period: {percentage_practices}%")
+display(md(f"Percentage of practices with a recording of a code within the codelist during the study period: {percentage_practices}%"))
 
 charts.deciles_chart(
         data_dict['practice_rate'],
