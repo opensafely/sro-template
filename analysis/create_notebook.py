@@ -115,12 +115,13 @@ for key, value in measures_dict.items():
     df = pd.read_csv(f'../output/measure_{value.id}.csv', parse_dates=['date']).sort_values(by='date')
     
 
-    if key == "ethnicity":
+    if key == "ethnicity_rate":
         df = convert_ethnicity(df)
         
     df = calculate_rate(df, numerator=value.numerator, denominator=value.denominator, rate_per=1000)
     
-    if key == "imd":
+    if key == "imd_rate":
+        df = calculate_imd_group(df, value.numerator, 'rate')
         df = redact_small_numbers(df, 5, value.numerator, value.denominator, 'rate')
     
     
