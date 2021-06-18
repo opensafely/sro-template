@@ -113,7 +113,7 @@ data_dict = {}
 for key, value in measures_dict.items():
     
     df = pd.read_csv(f'../output/measure_{value.id}.csv', parse_dates=['date']).sort_values(by='date')
-    
+    df = drop_missing_demographics(df, value.group_by[0])
 
     if key == "ethnicity_rate":
         df = convert_ethnicity(df)

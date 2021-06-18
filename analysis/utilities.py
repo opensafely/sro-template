@@ -81,6 +81,18 @@ def convert_ethnicity(df):
 
     return df
 
+def drop_missing_demographics(df, demographic):
+    """Drops any rows with missing values for a given demographic variable.
+
+    Args: 
+        df: measures dataframe
+        demographic: column name of demographic variable
+
+    Returns:
+        Dataframe with no rows missing demographic variable.
+    """
+    return df.loc[df[demographic].notnull(),:]
+
 def calculate_rate(df, numerator, denominator, rate_per=1000):
     """Creates a rate column for a dataframe with a numerator and denominator column.
     

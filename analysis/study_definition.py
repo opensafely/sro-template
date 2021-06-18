@@ -93,7 +93,7 @@ study = StudyDefinition(
     sex=patients.sex(
         return_expectations={
             "rate": "universal",
-            "category": {"ratios": {"M": 0.49, "F": 0.5, "U": 0.01}},
+            "category": {"ratios": {"M": 0.5, "F": 0.5}},
         }
     ),
 
