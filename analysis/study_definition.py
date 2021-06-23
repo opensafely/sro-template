@@ -7,8 +7,7 @@ from cohortextractor import (
     StudyDefinition, 
     patients, 
     codelist, 
-    Measure,
-    codelist_from_csv
+    Measure
 )
 
 # Import codelists
