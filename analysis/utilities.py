@@ -81,6 +81,22 @@ def convert_ethnicity(df):
 
     return df
 
+def convert_binary(df, binary_column, positive, negative):
+    """Converts a column with binary variable codes as 0 and 1 to understandable strings.
+
+    Args:
+        df: dataframe with binary column
+        binary_column: column name of binary variable
+        positive: string to encode 1 as
+        negative: string to encode 0 as
+
+    Returns:
+        Input dataframe with converted binary column
+    """
+    replace_dict = {0: negative, 1: positive}
+    df[binary_column] = df[binary_column].replace(replace_dict)
+    return df
+
 def drop_missing_demographics(df, demographic):
     """Drops any rows with missing values for a given demographic variable.
 
@@ -197,7 +213,7 @@ def get_percentage_practices(measure_table):
 
     return np.round((num_practices_in_study / num_practices_total) * 100, 2)
 
-def plot_measures(df, title, column_to_plot, category=False, y_label='Rate per 1000'):
+def plot_measures(df, filename, title, column_to_plot, category=False, y_label='Rate per 1000'):
     """Produce time series plot from measures table.  One line is plotted for each sub
     category within the category column.
 
@@ -208,6 +224,7 @@ def plot_measures(df, title, column_to_plot, category=False, y_label='Rate per 1
         category: Name of column indicating different categories
         y_label: String indicating y axis text
     """
+    plt.figure(figsize=(15,8))
     if category:
         for unique_category in df[category].unique():
 
@@ -228,6 +245,7 @@ def plot_measures(df, title, column_to_plot, category=False, y_label='Rate per 1
 
     else:
         pass
-
-    plt.show()
+    
+    plt.tight_layout()
+    plt.savefig(OUTPUT_DIR / filename)
     plt.clf()

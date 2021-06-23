@@ -15,76 +15,10 @@ register_matplotlib_converters()
 from IPython.display import HTML
 from IPython.display import Markdown as md
 from IPython.core.display import HTML as Center
-from utilities import *
 from config import marker, start_date, end_date, demographics, codelist_path
-from ebmdatalab import charts
-
+from IPython.display import Image, display
+from utilities import *
 %matplotlib inline
-
-
-class Measure:
-  def __init__(self, id, numerator, denominator, group_by, small_number_suppression):
-    self.id = id
-    self.numerator = numerator
-    self.denominator = denominator
-    self.group_by = group_by
-    self.small_number_suppression = small_number_suppression
-    
-
-# Create default measures
-measures = [
-
-    Measure(
-        id="event_code_rate",
-        numerator="event",
-        denominator="population",
-        group_by=["event_code"],
-        small_number_suppression=True
-    ),
-
-    Measure(
-        id="practice_rate",
-        numerator="event",
-        denominator="population",
-        group_by=["practice"],
-        small_number_suppression=False
-    ),
-
-
-
-]
-
-
-#Add demographics measures
-
-for d in demographics:
-
-    if d == 'imd':
-        apply_suppression = False
-    
-    else:
-        apply_suppression = True
-    
-    m = Measure(
-        id=f'{d}_rate',
-        numerator="event",
-        denominator="population",
-        group_by=[d],
-        small_number_suppression=apply_suppression
-    )
-    
-    measures.append(m)
-
-
-default_measures = ['event_code', 'practice']
-measures_ids = default_measures+ demographics
-measures_dict = {}
-
-for m in measures:
-    measures_dict[m.id] = m
-
-
-
 
 """
 
@@ -105,38 +39,10 @@ md(f"All analytical code and output is available for inspection at the [OpenSAFE
 """
 
 get_data = """\
-default_measures = ['event_code', 'practice']
-measures = default_measures+ demographics
-
-data_dict = {}
-
-for key, value in measures_dict.items():
-    
-    df = pd.read_csv(f'../output/measure_{value.id}.csv', parse_dates=['date']).sort_values(by='date')
-    df = drop_missing_demographics(df, value.group_by[0])
-
-    if key == "ethnicity_rate":
-        df = convert_ethnicity(df)
-        
-    df = calculate_rate(df, numerator=value.numerator, denominator=value.denominator, rate_per=1000)
-    
-    if key == "imd_rate":
-        df = calculate_imd_group(df, value.numerator, 'rate')
-        df = redact_small_numbers(df, 5, value.numerator, value.denominator, 'rate')
-    
-    
-    # get total population rate
-    if value.id=='practice_rate':
-        
-        df = drop_irrelevant_practices(df, 'practice')
-        
-        df_total = df.groupby(by='date')[[value.numerator, value.denominator]].sum().reset_index()
-        df_total = calculate_rate(df_total, numerator=value.numerator, denominator=value.denominator, rate_per=1000)
-        data_dict['total'] = df_total
-    
-    data_dict[value.id] = df
-    
 codelist = pd.read_csv(f'../{codelist_path}')
+
+image_paths = {d: f'../output/plot_{d}.png' for d in demographics}
+image_paths['total'] = '../output/plot_total.png'
 """
 
 output_total_title = """\
@@ -146,14 +52,15 @@ md(f"## Total {marker} Number")
 """
 
 output_total_plot = """\
-plot_measures(data_dict['total'], title=f"Total {marker} across whole population", column_to_plot='rate', category=False, y_label='Rate per 1000')
+display(Image(filename=image_paths['total']))
 """
 
 output_event_codes = """\
 display(
 md("### Sub totals by sub codes"),
 md("Events for the top 5 subcodes across the study period"))
-child_table = create_child_table(df=data_dict['event_code_rate'], code_df=codelist, code_column='code', term_column='term')
+
+child_table = pd.read_csv('../output/child_code_table.csv')
 child_table
     """
 
@@ -165,18 +72,10 @@ md("## Total Number by GP Practice")
 
 output_practice_plot = """\
 
-percentage_practices = get_percentage_practices(data_dict['practice_rate'])
+practice_table = pd.read_csv('../output/rate_table_practice.csv', parse_dates=['date']).sort_values(by='date')
+percentage_practices = get_percentage_practices(practice_table)
 md(f"Percentage of practices with a recording of a code within the codelist during the study period: {percentage_practices}%")
-
-charts.deciles_chart(
-        data_dict['practice_rate'],
-        period_column='date',
-        column='event',
-        title='Decile Chart',
-        ylabel='rate per 1000',
-        show_outer_percentiles=False,
-        show_legend=True,
-)
+display(Image(filename='../output/decile_chart.png'))
 """
 
 nb['cells'] = [
@@ -207,7 +106,7 @@ for d in range(len(demographics)):
     nb['cells'].append(nbf.v4.new_code_cell(cell_counts))
     
     cell_plot = """\
-    plot_measures(data_dict[f'{demographics[i]}_rate'], title=f'Breakdown by {demographics[i]}', column_to_plot='rate', category=demographics[i], y_label='Rate per 1000')
+    display(Image(filename=image_paths[demographics[i]]))
     i+=1
     """
     nb['cells'].append(nbf.v4.new_code_cell(cell_plot))
