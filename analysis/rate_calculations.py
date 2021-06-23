@@ -65,7 +65,13 @@ for key, value in measures_dict.items():
         df = calculate_imd_group(df, value.numerator, 'rate')
         df = redact_small_numbers(df, 5, value.numerator, value.denominator, 'rate')
     
-    
+    elif key == "care_home_status_rate":
+        df = convert_binary(df, 'care_home_status', 'Record of positive care home status', 'No record of positive care home status')
+
+    elif key =='learning_disability_rate':
+        df = convert_binary(df, 'learning_disability', 'Record of learning disability', 'No record of learning disability')
+
+
     # get total population rate
     if value.id=='practice_rate':
         
