@@ -15,10 +15,7 @@ study = StudyDefinition(
         "rate": "uniform",
     },
     index_date=end_date,
-    population=patients.registered_with_one_practice_between(
-        "index_date", "index_date"
-    ),
-
+    population=patients.all(),
     # ETHNICITY IN 6 CATEGORIES
     eth=patients.with_these_clinical_events(
         ethnicity_codes,
