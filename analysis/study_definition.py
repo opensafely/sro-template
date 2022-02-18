@@ -159,28 +159,26 @@ study = StudyDefinition(
             },
         },
     ),
-    care_home_status=patients.categorised_as(
-        {
-            "missing": "DEFAULT",
-            "Record of being in a care home": """ ch = 1 """,
-            "No record of being in a care home": """ ch = 0 """,
+    care_home_status=patients.care_home_status_as_of(
+        "any_covid_vaccine_date",
+        categorised_as={
+            "CareHome": """
+              IsPotentialCareHome
+              AND LocationDoesNotRequireNursing='Y'
+              AND LocationRequiresNursing='N'
+            """,
+            "NursingHome": """
+              IsPotentialCareHome
+              AND LocationDoesNotRequireNursing='N'
+              AND LocationRequiresNursing='Y'
+            """,
+            "CareOrNursingHome": "IsPotentialCareHome",
+            "PrivateHome": "NOT IsPotentialCareHome",
+            "": "DEFAULT",
         },
-        ch=patients.with_these_clinical_events(
-            nhse_care_homes_codes,
-            on_or_before="index_date",
-            returning="binary_flag",
-            return_expectations={
-                "incidence": 0.01,
-            },
-        ),
         return_expectations={
             "rate": "universal",
-            "category": {
-                "ratios": {
-                    "Record of being in a care home": 0.1,
-                    "No record of being in a care home": 0.9,
-                }
-            },
+            "category": {"ratios": {"CareHome": 0.30, "NursingHome": 0.10, "CareOrNursingHome": 0.10, "PrivateHome":0.45, "":0.05},},
         },
     ),
     event=patients.with_these_clinical_events(
