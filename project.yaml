@@ -37,10 +37,17 @@ actions:
       outputs:
         moderately_sensitive:
           measure_csv: output/measure_*_rate.csv
+
+  redact_measures:
+      run: python:latest python analysis/redact_measures.py
+      needs: [generate_measures]
+      outputs:
+        moderately_sensitive:
+          measures: output/measure_*_rat*.csv
   
   calculate_rates:
       run: python:latest python analysis/rate_calculations.py
-      needs: [generate_measures]
+      needs: [redact_measures]
       outputs:
         moderately_sensitive:
           tables: output/rate_table_*.csv

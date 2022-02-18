@@ -63,10 +63,7 @@ for key, value in measures_dict.items():
     df = pd.read_csv(os.path.join(OUTPUT_DIR, f'measure_{value.id}.csv'), parse_dates=['date']).sort_values(by='date')
     df = drop_missing_demographics(df, value.group_by[0])
     
-    if key == "imd_rate":
-        df = redact_small_numbers(df, 5, value.numerator, value.denominator, 'value')
-    
-    elif key == "care_home_status_rate":
+    if key == "care_home_status_rate":
         df = convert_binary(df, 'care_home_status', 'Record of positive care home status', 'No record of positive care home status')
 
     elif key =='learning_disability_rate':
