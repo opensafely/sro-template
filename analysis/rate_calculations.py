@@ -55,13 +55,9 @@ for key, value in measures_dict.items():
     
     df = pd.read_csv(os.path.join(OUTPUT_DIR, f'measure_{value.id}.csv'), parse_dates=['date']).sort_values(by='date')
     df = drop_missing_demographics(df, value.group_by[0])
-
-    
-        
-    df = calculate_rate(df, numerator=value.numerator, denominator=value.denominator, rate_per=1000)
     
     if key == "imd_rate":
-        df = redact_small_numbers(df, 5, value.numerator, value.denominator, 'rate')
+        df = redact_small_numbers(df, 5, value.numerator, value.denominator, 'value')
     
     elif key == "care_home_status_rate":
         df = convert_binary(df, 'care_home_status', 'Record of positive care home status', 'No record of positive care home status')
@@ -87,8 +83,8 @@ for key, value in measures_dict.items():
         ).savefig('output/decile_chart.png', bbox_inches='tight')  
         
         df_total = df.groupby(by='date')[[value.numerator, value.denominator]].sum().reset_index()
-        df_total = calculate_rate(df_total, numerator=value.numerator, denominator=value.denominator, rate_per=1000)
-        plot_measures(df_total, filename='plot_total.png', title='Population Rate', column_to_plot='rate', category=None, y_label='Rate per 1000')
+        df_total['value'] = df_total['event']/df_total['population']
+        plot_measures(df_total, filename='plot_total.png', title='Population Rate', column_to_plot='value', category=None, y_label='Rate per 1000')
         df_total.to_csv(os.path.join(OUTPUT_DIR, 'rate_table_total.csv'), index=False)
 
     elif value.id=='event_code_rate':
@@ -98,5 +94,5 @@ for key, value in measures_dict.items():
         child_code_table.to_csv('output/child_code_table.csv', index=False)
 
     else:
-        plot_measures(df, filename=f'plot_{value.group_by[0]}.png', title=f'Breakdown by {value.group_by[0]}', column_to_plot='rate', category=value.group_by[0], y_label='Rate per 1000')
+        plot_measures(df, filename=f'plot_{value.group_by[0]}.png', title=f'Breakdown by {value.group_by[0]}', column_to_plot='value', category=value.group_by[0], y_label='Rate per 1000')
         df.to_csv(os.path.join(OUTPUT_DIR, f'rate_table_{value.group_by[0]}.csv'), index=False)

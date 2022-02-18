@@ -77,25 +77,6 @@ def drop_missing_demographics(df, demographic):
     return df.loc[df[demographic].notnull(), :]
 
 
-def calculate_rate(df, numerator, denominator, rate_per=1000):
-    """Creates a rate column for a dataframe with a numerator and denominator column.
-
-    Args:
-        df: measures dataframe
-        numerator: numerator for rate
-        denominator: denominator for rate
-        rate_per: unit for calculated rate
-
-    Returns:
-        Input dataframe with additional rate column
-    """
-
-    rate = df[numerator] / (df[denominator] / rate_per)
-    df["rate"] = rate
-
-    return df
-
-
 def drop_irrelevant_practices(df, practice_col):
     """Drops irrelevant practices from the given measure table.
     An irrelevant practice has zero events during the study period.
