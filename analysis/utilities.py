@@ -47,29 +47,6 @@ def redact_small_numbers(df, n, numerator, denominator, rate_column):
     return df
 
 
-def convert_ethnicity(df):
-    """Converts the ethnicity of a dataframe from int to an understandable string.
-
-    Args:
-        df: dataframe with ethnicity column
-
-    Returns:
-        Input dataframe with converted ethnicity column
-    """
-    ethnicity_codes = {
-        1.0: "White",
-        2.0: "Mixed",
-        3.0: "Asian",
-        4.0: "Black",
-        5.0: "Other",
-        np.nan: "unknown",
-        0: "unknown",
-    }
-    df = df.replace({"ethnicity": ethnicity_codes})
-
-    return df
-
-
 def convert_binary(df, binary_column, positive, negative):
     """Converts a column with binary variable codes as 0 and 1 to understandable strings.
 
