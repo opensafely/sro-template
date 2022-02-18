@@ -135,19 +135,53 @@ study = StudyDefinition(
             },
         },
     ),
-    learning_disability=patients.with_these_clinical_events(
-        ld_codes,
-        on_or_before="index_date",
-        returning="binary_flag",
+    learning_disability=patients.categorised_as(
+        {
+            "missing": "DEFAULT",
+            "Record of learning disability": """ ld = 1 """,
+            "No record of learning disability": """ ld=0 """,
+        },
+        ld=patients.with_these_clinical_events(
+            ld_codes,
+            on_or_before="index_date",
+            returning="binary_flag",
+            return_expectations={
+                "incidence": 0.01,
+            },
+        ),
         return_expectations={
-            "incidence": 0.01,
+            "rate": "universal",
+            "category": {
+                "ratios": {
+                    "Record of learning disability": 0.1,
+                    "No record of learning disability": 0.9,
+                }
+            },
         },
     ),
-    care_home_status=patients.with_these_clinical_events(
-        nhse_care_homes_codes,
-        returning="binary_flag",
-        on_or_before="index_date",
-        return_expectations={"incidence": 0.2},
+    care_home_status=patients.categorised_as(
+        {
+            "missing": "DEFAULT",
+            "Record of being in a care home": """ ch = 1 """,
+            "No record of being in a care home": """ ch = 0 """,
+        },
+        ch=patients.with_these_clinical_events(
+            nhse_care_homes_codes,
+            on_or_before="index_date",
+            returning="binary_flag",
+            return_expectations={
+                "incidence": 0.01,
+            },
+        ),
+        return_expectations={
+            "rate": "universal",
+            "category": {
+                "ratios": {
+                    "Record of being in a care home": 0.1,
+                    "No record of being in a care home": 0.9,
+                }
+            },
+        },
     ),
     event=patients.with_these_clinical_events(
         codelist=codelist,
