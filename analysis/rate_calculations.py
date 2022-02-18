@@ -62,7 +62,6 @@ for key, value in measures_dict.items():
     df = calculate_rate(df, numerator=value.numerator, denominator=value.denominator, rate_per=1000)
     
     if key == "imd_rate":
-        df = calculate_imd_group(df, value.numerator, 'rate')
         df = redact_small_numbers(df, 5, value.numerator, value.denominator, 'rate')
     
     elif key == "care_home_status_rate":
