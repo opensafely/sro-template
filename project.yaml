@@ -45,12 +45,11 @@ actions:
         moderately_sensitive:
           measures: output/measure_*_rat*.csv
   
-  calculate_rates:
-      run: python:latest python analysis/rate_calculations.py
+  plot_measures:
+      run: python:latest python analysis/plot_measures.py
       needs: [redact_measures]
       outputs:
         moderately_sensitive:
-          tables: output/rate_table_*.csv
           child_code_table: output/child_code_table.csv
           plots: output/plot_*.png
           decile_chart: output/decile_chart.png
