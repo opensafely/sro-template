@@ -26,6 +26,13 @@ measures = [
         group_by=["practice"]
     ),
 
+    Measure(
+        id="population_rate",
+        numerator="event",
+        denominator="population",
+        group_by="population",
+        small_number_suppression=False
+    )
 
 
 ]
@@ -77,22 +84,21 @@ for key, value in measures_dict.items():
         period_column='date',
         column='event',
         title='Decile Chart',
-        ylabel='rate per 1000',
+        ylabel='Proportion',
         show_outer_percentiles=False,
         show_legend=True,
         ).savefig('output/decile_chart.png', bbox_inches='tight')  
         
-        df_total = df.groupby(by='date')[[value.numerator, value.denominator]].sum().reset_index()
-        df_total['value'] = df_total['event']/df_total['population']
-        plot_measures(df_total, filename='plot_total.png', title='Population Rate', column_to_plot='value', category=None, y_label='Rate per 1000')
-        df_total.to_csv(os.path.join(OUTPUT_DIR, 'rate_table_total.csv'), index=False)
-
     elif value.id=='event_code_rate':
         df.to_csv(os.path.join(OUTPUT_DIR, f'rate_table_{value.group_by[0]}.csv'), index=False)
         codelist = pd.read_csv(codelist_path)
         child_code_table = create_child_table(df=df, code_df=codelist, code_column='code', term_column='term')
         child_code_table.to_csv('output/child_code_table.csv', index=False)
 
+    elif value.id=='population_rate':
+        plot_measures(df, filename=f'plot_{value.group_by[0]}.png', title=f'Breakdown by {value.group_by[0]}', column_to_plot='value', category=False, y_label='Proportion')
+        df.to_csv(os.path.join(OUTPUT_DIR, f'rate_table_{value.group_by[0]}.csv'), index=False)
+
     else:
-        plot_measures(df, filename=f'plot_{value.group_by[0]}.png', title=f'Breakdown by {value.group_by[0]}', column_to_plot='value', category=value.group_by[0], y_label='Rate per 1000')
+        plot_measures(df, filename=f'plot_{value.group_by[0]}.png', title=f'Breakdown by {value.group_by[0]}', column_to_plot='value', category=value.group_by[0], y_label='Proportion')
         df.to_csv(os.path.join(OUTPUT_DIR, f'rate_table_{value.group_by[0]}.csv'), index=False)

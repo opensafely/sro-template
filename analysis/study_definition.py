@@ -197,6 +197,14 @@ measures = [
         small_number_suppression=False
     ),
 
+    Measure(
+        id="population_rate",
+        numerator="event",
+        denominator="population",
+        group_by="population",
+        small_number_suppression=False
+    )
+
 
 
 ]
