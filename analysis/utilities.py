@@ -143,7 +143,11 @@ def create_top_5_code_table(df, code_df, code_column, term_column, nrows=5):
         .sort_values("Events", ascending=False)
     )
 
-    event_counts["Events (thousands)"] = event_counts["Events"] / 1000
+    # calculate % makeup of each code
+    total_events = event_counts["Events"].sum()
+    event_counts["Proportion of codes (%)"] = round(
+        (event_counts["Events"] / total_events) * 100, 2
+    )
 
     # Gets the human-friendly description of the code for the given row
     # e.g. "Systolic blood pressure".
@@ -155,9 +159,21 @@ def create_top_5_code_table(df, code_df, code_column, term_column, nrows=5):
     # Cast the code to an integer.
     event_counts[code_column] = event_counts[code_column].astype(int)
 
-    # return top n rows
+    # check that codes not in the top 5 rows have >5 events
+    outside_top_5_percent = 1 - ((event_counts.head(5)["Events"].sum()) / total_events)
 
-    return event_counts.iloc[:nrows, :]
+    if 0 < (outside_top_5_percent * total_events) <= 5:
+        # drop percent column
+        event_counts = event_counts.loc[:, ["code", "Description"]]
+
+    else:
+        # give more logical column ordering
+        event_counts = event_counts.loc[
+            :, ["code", "Description", "Events", "Proportion of codes (%)"]
+        ]
+
+    # return top n rows
+    return event_counts.head(5)
 
 
 def get_number_practices(df):
