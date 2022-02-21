@@ -12,8 +12,9 @@ measures_dict = {}
 for m in measures:
     measures_dict[m.id] = m
 
-for key, value in measures_dict.items():
-    
-    df = pd.read_csv(os.path.join(OUTPUT_DIR, f'measure_{value.id}.csv'), parse_dates=['date']).sort_values(by='date')
-    df = redact_small_numbers(df, 5, value.numerator, value.denominator, 'value', 'date')
-    df.to_csv(os.path.join(OUTPUT_DIR, f'measure_{value.id}.csv'))
+if __name__ == '__main__':
+    for key, value in measures_dict.items():
+        
+        df = pd.read_csv(os.path.join(OUTPUT_DIR, f'measure_{value.id}.csv'), parse_dates=['date']).sort_values(by='date')
+        df = redact_small_numbers(df, 5, value.numerator, value.denominator, 'value', 'date')
+        df.to_csv(os.path.join(OUTPUT_DIR, f'measure_{value.id}.csv'))

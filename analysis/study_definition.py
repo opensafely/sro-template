@@ -160,7 +160,7 @@ study = StudyDefinition(
         },
     ),
     care_home_status=patients.care_home_status_as_of(
-        "any_covid_vaccine_date",
+        "index_date",
         categorised_as={
             "CareHome": """
               IsPotentialCareHome
