@@ -147,7 +147,7 @@ def get_percentage_practices(measure_table):
     practice_df_list = []
     for file in os.listdir(OUTPUT_DIR):
         if file.startswith("input_practice_count"):
-            df = pd.read_csv(os.path.join(OUTPUT_DIR, file))
+            df = pd.read_feather(os.path.join(OUTPUT_DIR, file))
             practice_df_list.append(df)
 
     total_practices_df = pd.concat(practice_df_list, axis=0)
