@@ -7,6 +7,7 @@ from pathlib import Path
 BASE_DIR = Path(__file__).parents[1]
 OUTPUT_DIR = BASE_DIR / "output"
 
+
 def redact_small_numbers(df, n, numerator, denominator, rate_column, date_column):
     """
     Takes counts df as input and suppresses low numbers.  Sequentially redacts
@@ -51,6 +52,7 @@ def redact_small_numbers(df, n, numerator, denominator, rate_column, date_column
 
     return pd.concat(df_list, axis=0)
 
+
 def convert_binary(df, binary_column, positive, negative):
     """Converts a column with binary variable codes as 0 and 1 to understandable strings.
 
@@ -94,7 +96,7 @@ def drop_irrelevant_practices(df, practice_col):
     return df[df[practice_col].isin(is_relevant[is_relevant == True].index)]
 
 
-def create_child_table(df, code_df, code_column, term_column, nrows=5):
+def create_top_5_code_table(df, code_df, code_column, term_column, nrows=5):
 
     """
     Args:

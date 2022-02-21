@@ -38,8 +38,8 @@ for key, value in measures_dict.items():
         
     elif value.id=='event_code_rate':
         codelist = pd.read_csv(codelist_path)
-        child_code_table = create_child_table(df=df, code_df=codelist, code_column='code', term_column='term')
-        child_code_table.to_csv('output/child_code_table.csv', index=False)
+        top_5_code_table = create_top_5_code_table(df=df, code_df=codelist, code_column='code', term_column='term')
+        top_5_code_table.to_csv('output/top_5_code_table.csv', index=False)
 
     elif value.id=='population_rate':
         plot_measures(df, filename=f'plot_{value.group_by[0]}.png', title=f'Breakdown by {value.group_by[0]}', column_to_plot='value', category=False, y_label='Proportion')

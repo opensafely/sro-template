@@ -60,8 +60,8 @@ display(
 md("### Sub totals by sub codes"),
 md("Events for the top 5 subcodes across the study period"))
 
-child_table = pd.read_csv('../output/child_code_table.csv')
-child_table
+top_5_code_table = pd.read_csv('../output/top_5_code_table.csv')
+top_5_code_table
     """
 
 output_practice_title = """\
