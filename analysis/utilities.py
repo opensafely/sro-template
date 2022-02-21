@@ -122,8 +122,8 @@ def drop_irrelevant_practices(df, practice_col):
 
 
 def create_top_5_code_table(df, code_df, code_column, term_column, nrows=5):
+    """Creates a table of the top 5 codes recorded with the number of events and % makeup of each code.
 
-    """
     Args:
         df: A measure table.
         code_df: A codelist table.
