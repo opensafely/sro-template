@@ -1,20 +1,14 @@
 # Import functions
-import json
 import pandas as pd
-
 from cohortextractor import StudyDefinition, patients, codelist, Measure
-
-# Import codelists
-from codelists import codelist, ld_codes, nhse_care_homes_codes
-
+from codelists import codelist, ld_codes
 from config import start_date, end_date, codelist_path, demographics
 
+# Get codes from codelist to use in expectations
 codelist_df = pd.read_csv(codelist_path)
 codelist_expectation_codes = codelist_df["code"].unique()
 
-
 # Specifiy study defeinition
-
 study = StudyDefinition(
     index_date=start_date,
     # Configure the expectations framework
@@ -178,7 +172,15 @@ study = StudyDefinition(
         },
         return_expectations={
             "rate": "universal",
-            "category": {"ratios": {"CareHome": 0.30, "NursingHome": 0.10, "CareOrNursingHome": 0.10, "PrivateHome":0.45, "":0.05},},
+            "category": {
+                "ratios": {
+                    "CareHome": 0.30,
+                    "NursingHome": 0.10,
+                    "CareOrNursingHome": 0.10,
+                    "PrivateHome": 0.45,
+                    "": 0.05,
+                },
+            },
         },
     ),
     event=patients.with_these_clinical_events(
@@ -204,6 +206,7 @@ study = StudyDefinition(
 
 # Create default measures
 measures = [
+    # events broken down by code
     Measure(
         id="event_code_rate",
         numerator="event",
@@ -211,6 +214,7 @@ measures = [
         group_by=["event_code"],
         small_number_suppression=False,
     ),
+    # events broken down by practice
     Measure(
         id="practice_rate",
         numerator="event",
@@ -218,6 +222,7 @@ measures = [
         group_by=["practice"],
         small_number_suppression=False,
     ),
+    # population rate
     Measure(
         id="population_rate",
         numerator="event",
@@ -231,7 +236,6 @@ measures = [
 # Add demographics measures
 
 for d in demographics:
-
     m = Measure(
         id=f"{d}_rate",
         numerator="event",
@@ -239,5 +243,4 @@ for d in demographics:
         group_by=[d],
         small_number_suppression=False,
     )
-
     measures.append(m)

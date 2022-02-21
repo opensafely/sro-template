@@ -1,12 +1,5 @@
-from cohortextractor import (
-    StudyDefinition,
-    patients,
-    codelist,
-    codelist_from_csv,
-    Measure,
-)
-from config import start_date, end_date
-
+from cohortextractor import StudyDefinition, patients
+from config import end_date
 from codelists import ethnicity_codes
 
 study = StudyDefinition(
@@ -27,7 +20,6 @@ study = StudyDefinition(
             "incidence": 0.75,
         },
     ),
-
     # fill missing ethnicity from SUS
     ethnicity_sus = patients.with_ethnicity_from_sus(
         returning="group_6",  
@@ -37,8 +29,6 @@ study = StudyDefinition(
             "incidence": 0.4,
             },
     ),
-    
-
     ethnicity = patients.categorised_as(
             {"Unknown": "DEFAULT",
             "White": "eth='1' OR (NOT eth AND ethnicity_sus='1')", 
@@ -51,7 +41,5 @@ study = StudyDefinition(
             "category": {"ratios": {"White": 0.2, "Mixed": 0.2, "Asian": 0.2, "Black": 0.2, "Other": 0.2}},
             "incidence": 0.4,
             },
-    ),
-
-
+    )
 )
