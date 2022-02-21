@@ -15,7 +15,7 @@ register_matplotlib_converters()
 from IPython.display import HTML
 from IPython.display import Markdown as md
 from IPython.core.display import HTML as Center
-from config import marker, start_date, end_date, demographics, codelist_path
+from config import measure_name, start_date, end_date, demographics, codelist_path
 from IPython.display import Image, display
 from utilities import *
 %matplotlib inline
@@ -25,15 +25,15 @@ from utilities import *
 header = """\
 display(
 md("# Service Restoration Observatory"),
-md(f"## Changes in {marker} between {start_date} and {end_date}"),
-md(f"Below are various time-series graphs showing changes in {marker} code use."),
+md(f"## Changes in {measure_name} between {start_date} and {end_date}"),
+md(f"Below are various time-series graphs showing changes in {measure_name} code use."),
 )
 """
 
 methods = """\
 display(
 md("### Methods"),
-md(f"Using OpenSAFELY-TPP, covering 40% of England's population, we have assessed coding activity related to {marker} between {start_date} and {end_date}. The codelist used can be found here at [OpenSAFELY Codelists](https://codelists.opensafely.org/).  For each month within the study period, we have calculated the rate at which the code was recorded per 1000 registered patients."),
+md(f"Using OpenSAFELY-TPP, covering 40% of England's population, we have assessed coding activity related to {measure_name} between {start_date} and {end_date}. The codelist used can be found here at [OpenSAFELY Codelists](https://codelists.opensafely.org/).  For each month within the study period, we have calculated the rate at which the code was recorded per 1000 registered patients."),
 md(f"All analytical code and output is available for inspection at the [OpenSAFELY GitHub repository](https://github.com/opensafely)")
 )
 """
@@ -47,7 +47,7 @@ image_paths['total'] = '../output/plot_total.png'
 
 output_total_title = """\
 display(
-md(f"## Total {marker} Number")
+md(f"## Total {measure_name} Number")
 )
 """
 
