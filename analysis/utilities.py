@@ -7,21 +7,15 @@ from pathlib import Path
 BASE_DIR = Path(__file__).parents[1]
 OUTPUT_DIR = BASE_DIR / "output"
 
-
-def redact_small_numbers(df, n, numerator, denominator, rate_column):
-    """Takes counts df as input and suppresses low numbers.  Sequentially redacts
+def redact_small_numbers(df, n, numerator, denominator, rate_column, date_column):
+    """
+    Takes counts df as input and suppresses low numbers.  Sequentially redacts
     low numbers from numerator and denominator until count of redcted values >=n.
     Rates corresponding to redacted values are also redacted.
-
-    Args:
-        df: measures dataframe
-        n: threshold for low number suppression
-        numerator: column name for numerator
-        denominator: column name for denominator
-        rate_column: column name for rate
-
-    Returns:
-        Input dataframe with low numbers suppressed
+    df: input df
+    n: threshold for low number suppression
+    numerator: numerator column to be redacted
+    denominator: denominator column to be redacted
     """
 
     def suppress_column(column):
@@ -32,20 +26,30 @@ def redact_small_numbers(df, n, numerator, denominator, rate_column):
             pass
 
         else:
-            column = column.replace([0, 1, 2, 3, 4, 5], np.nan)
+            column[column <= n] = np.nan
 
             while suppressed_count <= n:
                 suppressed_count += column.min()
-                column.iloc[column.idxmin()] = np.nan
+
+                column[column.idxmin()] = np.nan
         return column
 
-    for column in [numerator, denominator]:
-        df[column] = suppress_column(df[column])
+    df_list = []
 
-    df.loc[(df[numerator].isna()) | (df[denominator].isna()), rate_column] = np.nan
+    dates = df[date_column].unique()
 
-    return df
+    for d in dates:
+        df_subset = df.loc[df[date_column] == d, :]
 
+        for column in [numerator, denominator]:
+            df_subset[column] = suppress_column(df_subset[column])
+
+        df_subset.loc[
+            (df_subset[numerator].isna()) | (df_subset[denominator].isna()), rate_column
+        ] = np.nan
+        df_list.append(df_subset)
+
+    return pd.concat(df_list, axis=0)
 
 def convert_binary(df, binary_column, positive, negative):
     """Converts a column with binary variable codes as 0 and 1 to understandable strings.

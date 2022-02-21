@@ -15,5 +15,5 @@ for m in measures:
 for key, value in measures_dict.items():
     
     df = pd.read_csv(os.path.join(OUTPUT_DIR, f'measure_{value.id}.csv'), parse_dates=['date']).sort_values(by='date')
-    df = redact_small_numbers(df, 5, value.numerator, value.denominator, 'value')
+    df = redact_small_numbers(df, 5, value.numerator, value.denominator, 'value', 'date')
     df.to_csv(os.path.join(OUTPUT_DIR, f'measure_{value.id}.csv'))
