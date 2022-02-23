@@ -74,7 +74,9 @@ output_practice_plot = """\
 
 practice_table = pd.read_csv('../output/measure_practice_rate.csv', parse_dates=['date']).sort_values(by='date')
 percentage_practices = get_percentage_practices(practice_table)
-md(f"Percentage of practices with a recording of a code within the codelist during the study period: {percentage_practices}%")
+display(
+    md(f"Percentage of practices with a recording of a code within the codelist during the study period: {percentage_practices}%")
+)
 display(Image(filename='../output/decile_chart.png'))
 """
 
