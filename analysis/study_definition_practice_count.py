@@ -1,5 +1,4 @@
 from cohortextractor import StudyDefinition, patients
-from codelists import *
 from config import start_date, end_date
 
 # Specifiy study definition
