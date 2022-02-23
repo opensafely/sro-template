@@ -1,7 +1,6 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-import os
 import re
 from pathlib import Path
 
@@ -192,9 +191,11 @@ def get_percentage_practices(measure_table):
 
     # Read in all input practice count files and get num unique
     practice_df_list = []
-    for file in os.listdir(OUTPUT_DIR):
-        if file.startswith("input_practice_count"):
-            df = pd.read_feather(os.path.join(OUTPUT_DIR, file))
+    
+    
+    for file in OUTPUT_DIR.iterdir():
+        if file.name.startswith("input_practice_count"):
+            df = pd.read_feather(OUTPUT_DIR / file.name)
             practice_df_list.append(df)
 
     total_practices_df = pd.concat(practice_df_list, axis=0)
