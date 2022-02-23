@@ -20,7 +20,7 @@ for key, value in measures_dict.items():
         period_column='date',
         column='event',
         title='Decile Chart',
-        ylabel='Proportion',
+        ylabel='Proportion of population',
         show_outer_percentiles=False,
         show_legend=True,
         ).savefig('output/decile_chart.png', bbox_inches='tight')  
