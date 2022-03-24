@@ -41,8 +41,8 @@ md(f"All analytical code and output is available for inspection at the [OpenSAFE
 get_data = """\
 codelist = pd.read_csv(f'../{codelist_path}')
 
-image_paths = {d: f'../output/plot_{d}.png' for d in demographics}
-image_paths['total'] = '../output/plot_total.png'
+image_paths = {d: f'../output/joined/plot_{d}.png' for d in demographics}
+image_paths['total'] = '../output/joined/plot_total.png'
 """
 
 output_total_title = """\
@@ -60,7 +60,7 @@ display(
 md("### Sub totals by sub codes"),
 md("Events for the top 5 subcodes across the study period"))
 
-child_table = pd.read_csv('../output/child_code_table.csv')
+child_table = pd.read_csv('../output/joined/child_code_table.csv')
 child_table
     """
 
@@ -72,10 +72,10 @@ md("## Total Number by GP Practice")
 
 output_practice_plot = """\
 
-practice_table = pd.read_csv('../output/rate_table_practice.csv', parse_dates=['date']).sort_values(by='date')
+practice_table = pd.read_csv('../output/joined/rate_table_practice.csv', parse_dates=['date']).sort_values(by='date')
 percentage_practices = get_percentage_practices(practice_table)
 md(f"Percentage of practices with a recording of a code within the codelist during the study period: {percentage_practices}%")
-display(Image(filename='../output/decile_chart.png'))
+display(Image(filename='../output/joined/decile_chart.png'))
 """
 
 nb['cells'] = [
