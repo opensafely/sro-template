@@ -7,7 +7,7 @@ from config import demographics, codelist_path
 from ebmdatalab import charts
 
 BASE_DIR = Path(__file__).parents[1]
-OUTPUT_DIR = BASE_DIR / "output"
+OUTPUT_DIR = BASE_DIR / "output" / "joined"
 
 # Create default measures
 measures = [
@@ -86,7 +86,7 @@ for key, value in measures_dict.items():
         ylabel='rate per 1000',
         show_outer_percentiles=False,
         show_legend=True,
-        ).savefig('output/decile_chart.png', bbox_inches='tight')  
+        ).savefig(OUTPUT_DIR / 'decile_chart.png', bbox_inches='tight')  
         
         df_total = df.groupby(by='date')[[value.numerator, value.denominator]].sum().reset_index()
         df_total = calculate_rate(df_total, numerator=value.numerator, denominator=value.denominator, rate_per=1000)
@@ -97,7 +97,7 @@ for key, value in measures_dict.items():
         df.to_csv(os.path.join(OUTPUT_DIR, f'rate_table_{value.group_by[0]}.csv'), index=False)
         codelist = pd.read_csv(codelist_path)
         child_code_table = create_child_table(df=df, code_df=codelist, code_column='code', term_column='term')
-        child_code_table.to_csv('output/child_code_table.csv', index=False)
+        child_code_table.to_csv(OUTPUT_DIR / 'child_code_table.csv', index=False)
 
     else:
         plot_measures(df, filename=f'plot_{value.group_by[0]}.png', title=f'Breakdown by {value.group_by[0]}', column_to_plot='rate', category=value.group_by[0], y_label='Rate per 1000')
