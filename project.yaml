@@ -19,7 +19,7 @@ actions:
         cohort: output/input_ethnicity.feather
 
   join_ethnicity:
-    run: python:latest python analysis/join_ethnicity.py
+    run: cohort-joiner:v0.0.9 --lhs output/input_*.csv --rhs output/input_ethnicity.csv --output-dir output/joined
     needs: [generate_study_population, generate_study_population_ethnicity]
     outputs:
       highly_sensitive:
@@ -32,7 +32,7 @@ actions:
         cohort: output/input_practice_count_*.feather
 
   generate_measures:
-      run: cohortextractor:latest generate_measures --study-definition study_definition --output-dir=output
+      run: cohortextractor:latest generate_measures --study-definition study_definition --output-dir=output/joined
       needs: [join_ethnicity]
       outputs:
         moderately_sensitive:
@@ -71,7 +71,7 @@ actions:
     needs: [create_notebook, generate_study_population_practice_count, generate_top_5_table, plot_measures, redact_measures]
     outputs:
       moderately_sensitive:
-        notebook: output/SRO_Notebook.html
+        notebook: output/joined/SRO_Notebook.html
 
   # run_tests:
   #   run: python:latest python -m pytest --junit-xml=output/pytest.xml --verbose

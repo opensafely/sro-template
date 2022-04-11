@@ -41,8 +41,8 @@ md(f"All analytical code and output is available for inspection at the [OpenSAFE
 get_data = """\
 codelist = pd.read_csv(f'../{codelist_path}')
 
-image_paths = {d: f'../output/plot_{d}.png' for d in demographics}
-image_paths['total'] = '../output/plot_population.png'
+image_paths = {d: f'../output/joined/plot_{d}.png' for d in demographics}
+image_paths['total'] = '../output/joined/plot_total.png'
 """
 
 output_total_title = """\
@@ -80,7 +80,7 @@ display(
 display(Image(filename='../output/decile_chart.png'))
 """
 
-nb['cells'] = [
+nb["cells"] = [
     nbf.v4.new_code_cell(imports),
     nbf.v4.new_code_cell(header),
     nbf.v4.new_code_cell(methods),
@@ -90,13 +90,13 @@ nb['cells'] = [
     nbf.v4.new_code_cell(output_event_codes),
     nbf.v4.new_code_cell(output_practice_title),
     nbf.v4.new_code_cell(output_practice_plot),
-    ]
+]
 
 counter = """\
 i=0
 """
 
-nb['cells'].append(nbf.v4.new_code_cell(counter))
+nb["cells"].append(nbf.v4.new_code_cell(counter))
 
 for d in range(len(demographics)):
     cell_counts = """\
@@ -105,13 +105,13 @@ for d in range(len(demographics)):
     )
    
     """
-    nb['cells'].append(nbf.v4.new_code_cell(cell_counts))
-    
+    nb["cells"].append(nbf.v4.new_code_cell(cell_counts))
+
     cell_plot = """\
     display(Image(filename=image_paths[demographics[i]]))
     i+=1
     """
-    nb['cells'].append(nbf.v4.new_code_cell(cell_plot))
+    nb["cells"].append(nbf.v4.new_code_cell(cell_plot))
 
 
-nbf.write(nb, 'analysis/SRO_Notebook.ipynb')
+nbf.write(nb, "analysis/SRO_Notebook.ipynb")
