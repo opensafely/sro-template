@@ -42,7 +42,7 @@ get_data = """\
 codelist = pd.read_csv(f'../{codelist_path}')
 
 image_paths = {d: f'../output/joined/plot_{d}.png' for d in demographics}
-image_paths['total'] = '../output/joined/plot_total.png'
+image_paths['total'] = '../output/joined/plot_population.png'
 """
 
 output_total_title = """\
