@@ -14,8 +14,7 @@ activity codes of interest.
 
 This is a template repository for making new OpenSAFELY SRO resarch projects.
 It allows you to easily generate a report to describe changes in coding trends 
-for any codelists available on OpenCodelists. An example of a report that uses 
-this template can be found [here]().
+for any codelists available on OpenCodelists.
 
 # How to use this template
 
