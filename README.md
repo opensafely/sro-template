@@ -30,5 +30,5 @@ sro-template as a template.
   * Specify the title for your measure. This will be used to populate text within the report.
   * Provide the path to the codelist you added to your project in step 3.
 5.  Update the `--index-date-range` in `project.yaml` to match the dates defined in step 4 in the  `generate_study_population` and `generate_study_population_practice_count` actions.
-8.  This code can then be [run locally](https://docs.opensafely.org/en/latest/actions-pipelines/#running-your-code-locally) using the command `opensafely run run_all`
+8.  This code can then be [run locally](https://docs.opensafely.org/en/latest/actions-pipelines/#running-your-code-locally) using the command `opensafely run run_all`. This will execute all actions specified in the `project.yaml`. For more details about how to use opensafely at the command line see [here](https://docs.opensafely.org/opensafely-cli/#using-opensafely-at-the-command-line).
 9.  For instructions on how to run this code against real data [see this documentation](https://docs.opensafely.org/en/latest/job-server/).
