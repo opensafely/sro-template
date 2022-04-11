@@ -7,46 +7,58 @@ actions:
 
   
   generate_study_population:
-    run: cohortextractor:latest generate_cohort --study-definition study_definition --index-date-range "2021-06-01 to 2021-12-01 by month" --output-dir=output
+    run: cohortextractor:latest generate_cohort --study-definition study_definition --index-date-range "2021-06-01 to 2021-12-01 by month" --output-dir=output --output-format=feather
     outputs:
       highly_sensitive:
-        cohort: output/input_*.csv
+        cohort: output/input_*.feather
 
   generate_study_population_ethnicity:
-    run: cohortextractor:latest generate_cohort --study-definition study_definition_ethnicity --output-dir=output
+    run: cohortextractor:latest generate_cohort --study-definition study_definition_ethnicity --output-dir=output --output-format=feather
     outputs:
       highly_sensitive:
-        cohort: output/input_ethnicity.csv
+        cohort: output/input_ethnicity.feather
 
   join_ethnicity:
     run: cohort-joiner:v0.0.9 --lhs output/input_*.csv --rhs output/input_ethnicity.csv --output-dir output/joined
     needs: [generate_study_population, generate_study_population_ethnicity]
     outputs:
       highly_sensitive:
-        cohort: output/joined/input_*.csv
+        cohort: output/input*.feather
 
   generate_study_population_practice_count:
-    run: cohortextractor:latest generate_cohort --study-definition study_definition_practice_count --index-date-range "2021-06-01 to 2021-12-01 by month" --output-dir=output/joined
+    run: cohortextractor:latest generate_cohort --study-definition study_definition_practice_count --index-date-range "2021-06-01 to 2021-12-01 by month" --output-dir=output --output-format=feather
     outputs:
       highly_sensitive:
-        cohort: output/joined/input_practice_count_*.csv
+        cohort: output/input_practice_count_*.feather
 
   generate_measures:
       run: cohortextractor:latest generate_measures --study-definition study_definition --output-dir=output/joined
       needs: [join_ethnicity]
       outputs:
         moderately_sensitive:
-          measure_csv: output/joined/measure_*_rate.csv
-  
-  calculate_rates:
-      run: python:latest python analysis/rate_calculations.py
+          measure_csv: output/measure_*_rate.csv
+
+  redact_measures:
+      run: python:latest python analysis/redact_measures.py
       needs: [generate_measures]
       outputs:
         moderately_sensitive:
-          tables: output/joined/rate_table_*.csv
-          child_code_table: output/joined/child_code_table.csv
-          plots: output/joined/plot_*.png
-          decile_chart: output/joined/decile_chart.png
+          measures: output/measure_*_rat*.csv
+  
+  generate_top_5_table:
+      run: python:latest python analysis/generate_top_5_tables.py
+      needs: [redact_measures]
+      outputs:
+        moderately_sensitive:
+          table: output/top_5_code_table.csv
+
+  plot_measures:
+      run: python:latest python analysis/plot_measures.py
+      needs: [redact_measures]
+      outputs:
+        moderately_sensitive:
+          plots: output/plot_*.png
+          decile_chart: output/decile_chart.png
   
   create_notebook:
     run: python:latest python analysis/create_notebook.py
@@ -55,14 +67,14 @@ actions:
         notebook: analysis/SRO_Notebook.ipynb
 
   generate_notebook:
-    run: jupyter:latest jupyter nbconvert /workspace/analysis/SRO_Notebook.ipynb --execute --to html --output-dir=/workspace/output/joined --ExecutePreprocessor.timeout=86400 --no-input
-    needs: [create_notebook, calculate_rates, generate_study_population_practice_count]
+    run: jupyter:latest jupyter nbconvert /workspace/analysis/SRO_Notebook.ipynb --execute --to html --output-dir=/workspace/output --ExecutePreprocessor.timeout=86400 --no-input
+    needs: [create_notebook, generate_study_population_practice_count, generate_top_5_table, plot_measures, redact_measures]
     outputs:
       moderately_sensitive:
         notebook: output/joined/SRO_Notebook.html
 
-  run_tests:
-    run: python:latest python -m pytest --junit-xml=output/pytest.xml --verbose
-    outputs:
-      moderately_sensitive:
-        log: output/pytest.xml
+  # run_tests:
+  #   run: python:latest python -m pytest --junit-xml=output/pytest.xml --verbose
+  #   outputs:
+  #     moderately_sensitive:
+  #       log: output/pytest.xml
