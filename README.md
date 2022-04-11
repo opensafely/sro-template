@@ -18,7 +18,7 @@ for any codelists available on OpenCodelists.
 
 # How to use this template
 
-1. Create or select codelist on [OpenSAFELY Codelists](https://codelists.opensafely.org/).
+1. Create or select codelist on [OpenSAFELY Codelists](https://www.opencodelists.org/docs/#creating-a-codelist-from-scratch).
 Instructions on how to do this can be found [in this documentation](https://docs.opensafely.org/en/latest/codelist-creation/).
 2. Create a new repository in the OpenSAFELY organisation and select 
 sro-template as a template.
