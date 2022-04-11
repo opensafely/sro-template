@@ -10,25 +10,8 @@ OUTPUT_DIR = BASE_DIR / "output" / "joined"
 
 def match_input_files(file: str) -> bool:
     """Checks if file name has format outputted by cohort extractor"""
-    pattern = r"^input_20\d\d-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])\.feather"
+    pattern = r"^input_20\d\d-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])\.csv.gz"
     return True if re.match(pattern, file) else False
-
-
-def join_ethnicity(directory: str) -> None:
-    """Finds 'input_ethnicity.feather' in directory and combines with each input file."""
-
-    dirpath = Path(directory)
-    filelist = dirpath.iterdir()
-
-    # get ethnicity input file
-    ethnicity_df = pd.read_feather(dirpath / "input_ethnicity.feather")
-    ethnicity_dict = dict(zip(ethnicity_df["patient_id"], ethnicity_df["ethnicity"]))
-
-    for file in filelist:
-        if match_input_files(file.name):
-            df = pd.read_feather(dirpath / file.name)
-            df["ethnicity"] = df["patient_id"].map(ethnicity_dict)
-            df.to_feather(dirpath / file.name)
 
 
 def redact_small_numbers(df, n, numerator, denominator, rate_column, date_column):
@@ -190,11 +173,10 @@ def get_percentage_practices(measure_table):
 
     # Read in all input practice count files and get num unique
     practice_df_list = []
-    
-    
+
     for file in OUTPUT_DIR.iterdir():
         if file.name.startswith("input_practice_count"):
-            df = pd.read_feather(OUTPUT_DIR / file.name)
+            df = pd.read_csv(OUTPUT_DIR / file.name)
             practice_df_list.append(df)
 
     total_practices_df = pd.concat(practice_df_list, axis=0)

@@ -4,7 +4,7 @@ from study_definition import measures
 from utilities import redact_small_numbers
 
 BASE_DIR = Path(__file__).parents[1]
-OUTPUT_DIR = BASE_DIR / "output"
+OUTPUT_DIR = BASE_DIR / "output/joined"
 
 measures_dict = {}
 

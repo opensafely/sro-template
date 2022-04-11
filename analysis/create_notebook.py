@@ -42,7 +42,7 @@ get_data = """\
 codelist = pd.read_csv(f'../{codelist_path}')
 
 image_paths = {d: f'../output/joined/plot_{d}.png' for d in demographics}
-image_paths['total'] = '../output/joined/plot_total.png'
+image_paths['total'] = '../output/joined/plot_population.png'
 """
 
 output_total_title = """\
@@ -60,7 +60,7 @@ display(
 md("### Sub totals by sub codes"),
 md("Events for the top 5 subcodes across the study period"))
 
-top_5_code_table = pd.read_csv('../output/top_5_code_table.csv')
+top_5_code_table = pd.read_csv('../output/joined/top_5_code_table.csv')
 top_5_code_table
     """
 
@@ -72,12 +72,12 @@ md("## Total Number by GP Practice")
 
 output_practice_plot = """\
 
-practice_table = pd.read_csv('../output/measure_practice_rate.csv', parse_dates=['date']).sort_values(by='date')
+practice_table = pd.read_csv('../output/joined/measure_practice_rate.csv', parse_dates=['date']).sort_values(by='date')
 percentage_practices = get_percentage_practices(practice_table)
 display(
     md(f"Percentage of practices with a recording of a code within the codelist during the study period: {percentage_practices}%")
 )
-display(Image(filename='../output/decile_chart.png'))
+display(Image(filename='../output/joined/decile_chart.png'))
 """
 
 nb["cells"] = [

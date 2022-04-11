@@ -13,7 +13,7 @@ for key, value in measures_dict.items():
     if value.id=='practice_rate':
         
         df = drop_irrelevant_practices(df, 'practice')
-        df.to_csv(os.path.join(OUTPUT_DIR, f'rate_table_{value.group_by[0]}.csv'), index=False)
+        df.to_csv(OUTPUT_DIR / f'rate_table_{value.group_by[0]}.csv', index=False)
 
         charts.deciles_chart(
         df,
@@ -23,7 +23,7 @@ for key, value in measures_dict.items():
         ylabel='Proportion of population',
         show_outer_percentiles=False,
         show_legend=True,
-        ).savefig('output/decile_chart.png', bbox_inches='tight')  
+        ).savefig(OUTPUT_DIR / 'decile_chart.png', bbox_inches='tight')  
         
     elif value.id=='population_rate':
         plot_measures(df, filename=f'plot_{value.group_by[0]}.png', title=f'Breakdown by {value.group_by[0]}', column_to_plot='value', category=False, y_label='Proportion')
